@@ -1,0 +1,149 @@
+version: '3.8'
+
+# Development Docker Compose Configuration
+# This configuration is optimized for local development with hot-reload
+
+services:
+  # Y-Connect WhatsApp Bot Application (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: y-connect-app-dev
+    ports:
+      - "8000:8000"
+    environment:
+      # Application Settings
+      - APP_NAME=y-connect-whatsapp-bot
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+      
+      # WhatsApp Business API
+      - WHATSAPP_API_URL=${WHATSAPP_API_URL:-https://graph.facebook.com/v18.0}
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN:-test_token}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID:-test_phone_id}
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN:-test_verify_token}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET:-test_secret}
+      
+      # LLM API
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_API_KEY=${LLM_API_KEY:-test_key}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4}
+      - LLM_API_URL=${LLM_API_URL:-https://api.openai.com/v1}
+      
+      # Vector Database
+      - VECTOR_DB_PROVIDER=qdrant
+      - VECTOR_DB_URL=http://qdrant:6333
+      - VECTOR_DB_API_KEY=
+      - VECTOR_DB_INDEX_NAME=y-connect-schemes
+      - VECTOR_EMBEDDING_DIMENSION=384
+      
+      # PostgreSQL
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=y_connect
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_POOL_SIZE=5
+      - POSTGRES_MAX_OVERFLOW=10
+      
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_PASSWORD=
+      - REDIS_SESSION_TTL=86400
+      
+      # Session Management
+      - SESSION_EXPIRY_HOURS=24
+      
+      # Performance Settings
+      - MAX_CONCURRENT_SESSIONS=50
+      - RESPONSE_TIMEOUT_SECONDS=10
+      - RAG_TOP_K_RESULTS=5
+      - RAG_CONFIDENCE_THRESHOLD=0.7
+      
+      # Message Settings
+      - MAX_MESSAGE_LENGTH=1600
+      - CHUNK_SIZE_TOKENS=512
+      - CHUNK_OVERLAP_TOKENS=50
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    
+    networks:
+      - y-connect-dev-network
+    
+    volumes:
+      # Mount source code for hot-reload
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+      - ./data:/app/data
+      - ./tests:/app/tests
+    
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # PostgreSQL Database (Development)
+  postgres:
+    image: postgres:14-alpine
+    container_name: y-connect-postgres-dev
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_DB=y_connect
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    networks:
+      - y-connect-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (Development)
+  redis:
+    image: redis:7-alpine
+    container_name: y-connect-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    networks:
+      - y-connect-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Qdrant Vector Database (Development)
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: y-connect-qdrant-dev
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-dev-data:/qdrant/storage
+    networks:
+      - y-connect-dev-network
+
+networks:
+  y-connect-dev-network:
+    driver: bridge
+
+volumes:
+  postgres-dev-data:
+    driver: local
+  redis-dev-data:
+    driver: local
+  qdrant-dev-data:
+    driver: local

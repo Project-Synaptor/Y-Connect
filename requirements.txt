@@ -1,0 +1,39 @@
+# Y-Connect WhatsApp Bot Dependencies
+
+# Web Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# HTTP Client
+httpx>=0.28.0
+
+# Database
+psycopg2-binary>=2.9.10
+asyncpg>=0.29.0
+redis>=5.2.0
+aioredis>=2.0.1
+
+# Testing
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+hypothesis>=6.100.0
+
+# Language Processing
+langdetect==1.0.9
+
+# Vector Database
+qdrant-client>=1.7.0
+
+# Embeddings
+sentence-transformers>=2.2.0
+
+# Environment Management
+python-dotenv>=1.0.0
+
+# Logging
+python-json-logger>=3.0.0
+
+# Monitoring
+prometheus-client>=0.20.0
