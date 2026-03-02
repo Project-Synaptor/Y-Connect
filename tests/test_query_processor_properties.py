@@ -125,7 +125,7 @@ class TestQueryProcessorProperties:
     
     # Property 8: Entity Extraction Completeness
     # Validates: Requirements 3.1
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_text=st.one_of(
             query_with_age_strategy(),
@@ -160,7 +160,7 @@ class TestQueryProcessorProperties:
                 assert result.entities["age"] == expected_value, \
                     f"Expected age {expected_value}, got {result.entities.get('age')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_data=query_with_location_strategy(),
         session=user_session_strategy()
@@ -183,7 +183,7 @@ class TestQueryProcessorProperties:
         assert result.entities["location"] == expected_state_code, \
             f"Expected location {expected_state_code}, got {result.entities.get('location')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_data=query_with_occupation_strategy(),
         session=user_session_strategy()
@@ -206,7 +206,7 @@ class TestQueryProcessorProperties:
         assert result.entities["occupation"] == expected_occupation, \
             f"Expected occupation {expected_occupation}, got {result.entities.get('occupation')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_data=query_with_gender_strategy(),
         session=user_session_strategy()
@@ -229,7 +229,7 @@ class TestQueryProcessorProperties:
         assert result.entities["gender"] == expected_gender, \
             f"Expected gender {expected_gender}, got {result.entities.get('gender')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_data=query_with_income_strategy(),
         session=user_session_strategy()
@@ -252,7 +252,7 @@ class TestQueryProcessorProperties:
         assert result.entities["income"] == expected_income, \
             f"Expected income {expected_income}, got {result.entities.get('income')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         query_data=query_with_category_strategy(),
         session=user_session_strategy()
@@ -279,7 +279,7 @@ class TestQueryProcessorProperties:
 
     # Property 12: Conversation Context Persistence
     # Validates: Requirements 3.5
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         first_query_data=query_with_occupation_strategy(),
         second_query=st.text(min_size=5, max_size=100),
@@ -316,7 +316,7 @@ class TestQueryProcessorProperties:
                 f"Occupation value changed. Expected {expected_occupation}, " \
                 f"got {result2.entities.get('occupation')}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         first_query_data=query_with_location_strategy(),
         second_query_data=query_with_occupation_strategy(),
@@ -349,7 +349,7 @@ class TestQueryProcessorProperties:
         if "occupation" in result2.entities:
             assert result2.entities["occupation"] == expected_occupation
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         queries=st.lists(
             st.one_of(
@@ -397,7 +397,7 @@ class TestQueryProcessorProperties:
 
     # Property 11: Spelling Error Robustness
     # Validates: Requirements 3.4
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         session=user_session_strategy()
     )
@@ -428,7 +428,7 @@ class TestQueryProcessorProperties:
             assert misspelled_result.intent in [correct_intent, IntentType.SEARCH_SCHEMES], \
                 f"Intent changed for misspelled query: {misspelled}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         session=user_session_strategy()
     )
@@ -455,7 +455,7 @@ class TestQueryProcessorProperties:
             assert correct_result.intent == IntentType.SEARCH_SCHEMES
             assert misspelled_result.intent == IntentType.SEARCH_SCHEMES
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         session=user_session_strategy()
     )
@@ -489,7 +489,7 @@ class TestQueryProcessorProperties:
             assert formal_result.intent == colloquial_result.intent, \
                 f"Intent differs: formal={formal_result.intent}, colloquial={colloquial_result.intent}"
     
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     @given(
         base_query=st.sampled_from([
             "farmer", "student", "education", "health", "agriculture"

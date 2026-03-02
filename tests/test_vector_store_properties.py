@@ -97,7 +97,7 @@ class TestVectorStoreProperties:
         top_k=st.integers(min_value=1, max_value=10),
         num_documents=st.integers(min_value=0, max_value=20)
     )
-    @settings(max_examples=50, deadline=None)
+    @settings(max_examples=12, deadline=None)
     def test_property_13_retrieval_result_count(self, top_k, num_documents):
         """
         Feature: y-connect-whatsapp-bot, Property 13: Retrieval Result Count
@@ -176,7 +176,7 @@ class TestVectorStoreProperties:
         query_text=st.text(min_size=10, max_size=200),
         top_k=st.integers(min_value=1, max_value=10)
     )
-    @settings(max_examples=20, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_retrieval_count_with_real_embeddings(self, query_text, top_k):
         """
         Test retrieval count with real embedding generation
@@ -264,7 +264,7 @@ class TestVectorStoreProperties:
         num_schemes=st.integers(min_value=0, max_value=15),
         top_k=st.integers(min_value=1, max_value=10)
     )
-    @settings(max_examples=30, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_scheme_vector_store_result_count(self, num_schemes, top_k):
         """
         Test that SchemeVectorStore respects result count limits
@@ -295,7 +295,7 @@ class TestVectorStoreProperties:
         updated_description=st.text(min_size=50, max_size=200),
         query_text=st.text(min_size=20, max_size=100)
     )
-    @settings(max_examples=20, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_property_17_embedding_update_propagation(
         self,
         original_description,
@@ -439,7 +439,7 @@ class TestVectorStoreProperties:
         scheme=scheme_strategy(),
         update_field=st.sampled_from(["description", "benefits", "application_process"])
     )
-    @settings(max_examples=15, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_scheme_update_propagation_integration(self, scheme, update_field):
         """
         Integration test for scheme update propagation

@@ -172,6 +172,384 @@ class TestSchemeRepository:
         
         # Cleanup
         SchemeRepository.delete_scheme("test_trans_001")
+    
+    def test_search_schemes_by_state(self):
+        """Test searching schemes by applicable state"""
+        # Insert test schemes with different states
+        scheme1 = Scheme(
+            scheme_id="test_state_001",
+            scheme_name="State Specific Scheme 1",
+            description="Scheme for Maharashtra",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["MAHARASHTRA"],
+            benefits="State benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/state1",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme2 = Scheme(
+            scheme_id="test_state_002",
+            scheme_name="State Specific Scheme 2",
+            description="Scheme for Karnataka",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["KARNATAKA"],
+            benefits="State benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/state2",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme3 = Scheme(
+            scheme_id="test_state_003",
+            scheme_name="All India Scheme",
+            description="Scheme for all states",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="All India benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/all",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        SchemeRepository.insert_scheme(scheme1)
+        SchemeRepository.insert_scheme(scheme2)
+        SchemeRepository.insert_scheme(scheme3)
+        
+        # Search by state
+        maharashtra_schemes = SchemeRepository.search_schemes(state="maharashtra")
+        assert len(maharashtra_schemes) >= 1, "Should find at least one Maharashtra scheme"
+        assert any(s.scheme_id == "test_state_001" for s in maharashtra_schemes)
+        
+        # Search by Karnataka
+        karnataka_schemes = SchemeRepository.search_schemes(state="karnataka")
+        assert len(karnataka_schemes) >= 1, "Should find at least one Karnataka scheme"
+        assert any(s.scheme_id == "test_state_002" for s in karnataka_schemes)
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_state_001")
+        SchemeRepository.delete_scheme("test_state_002")
+        SchemeRepository.delete_scheme("test_state_003")
+    
+    def test_search_schemes_by_status(self):
+        """Test searching schemes by status"""
+        # Insert test schemes with different statuses
+        scheme1 = Scheme(
+            scheme_id="test_status_001",
+            scheme_name="Active Scheme",
+            description="An active scheme",
+            category=SchemeCategory.EDUCATION,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Active benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/active",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme2 = Scheme(
+            scheme_id="test_status_002",
+            scheme_name="Expired Scheme",
+            description="An expired scheme",
+            category=SchemeCategory.EDUCATION,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Expired benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/expired",
+            status=SchemeStatus.EXPIRED,
+            end_date=datetime(2020, 1, 1)
+        )
+        
+        scheme3 = Scheme(
+            scheme_id="test_status_003",
+            scheme_name="Upcoming Scheme",
+            description="An upcoming scheme",
+            category=SchemeCategory.EDUCATION,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Upcoming benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/upcoming",
+            status=SchemeStatus.UPCOMING,
+            start_date=datetime(2025, 1, 1)
+        )
+        
+        SchemeRepository.insert_scheme(scheme1)
+        SchemeRepository.insert_scheme(scheme2)
+        SchemeRepository.insert_scheme(scheme3)
+        
+        # Search by active status
+        active_schemes = SchemeRepository.search_schemes(status="active")
+        assert len(active_schemes) >= 1, "Should find at least one active scheme"
+        assert all(s.status == SchemeStatus.ACTIVE for s in active_schemes)
+        
+        # Search by expired status
+        expired_schemes = SchemeRepository.search_schemes(status="expired")
+        assert len(expired_schemes) >= 1, "Should find at least one expired scheme"
+        assert all(s.status == SchemeStatus.EXPIRED for s in expired_schemes)
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_status_001")
+        SchemeRepository.delete_scheme("test_status_002")
+        SchemeRepository.delete_scheme("test_status_003")
+    
+    def test_search_schemes_by_authority(self):
+        """Test searching schemes by authority"""
+        # Insert test schemes with different authorities
+        scheme1 = Scheme(
+            scheme_id="test_auth_001",
+            scheme_name="Central Scheme",
+            description="A central scheme",
+            category=SchemeCategory.HEALTH,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Central benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/central",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme2 = Scheme(
+            scheme_id="test_auth_002",
+            scheme_name="State Scheme",
+            description="A state scheme",
+            category=SchemeCategory.HEALTH,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["MAHARASHTRA"],
+            benefits="State benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/state",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        SchemeRepository.insert_scheme(scheme1)
+        SchemeRepository.insert_scheme(scheme2)
+        
+        # Search by central authority
+        central_schemes = SchemeRepository.search_schemes(authority="central")
+        assert len(central_schemes) >= 1, "Should find at least one central scheme"
+        assert all(s.authority == SchemeAuthority.CENTRAL for s in central_schemes)
+        
+        # Search by state authority
+        state_schemes = SchemeRepository.search_schemes(authority="state")
+        assert len(state_schemes) >= 1, "Should find at least one state scheme"
+        assert all(s.authority == SchemeAuthority.STATE for s in state_schemes)
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_auth_001")
+        SchemeRepository.delete_scheme("test_auth_002")
+    
+    def test_search_schemes_with_pagination(self):
+        """Test searching schemes with limit and offset"""
+        # Insert multiple test schemes
+        schemes = []
+        for i in range(10):
+            scheme = Scheme(
+                scheme_id=f"test_pagination_{i:03d}",
+                scheme_name=f"Pagination Scheme {i}",
+                description=f"Test scheme {i}",
+                category=SchemeCategory.OTHER,
+                authority=SchemeAuthority.CENTRAL,
+                applicable_states=["ALL"],
+                benefits=f"Benefits {i}",
+                application_process="Apply online",
+                official_url=f"https://example.gov.in/pag{i}",
+                status=SchemeStatus.ACTIVE
+            )
+            schemes.append(scheme)
+            SchemeRepository.insert_scheme(scheme)
+        
+        # Test limit
+        limited_schemes = SchemeRepository.search_schemes(limit=5)
+        assert len(limited_schemes) == 5, "Should return exactly 5 schemes"
+        
+        # Test offset
+        offset_schemes = SchemeRepository.search_schemes(limit=5, offset=5)
+        assert len(offset_schemes) == 5, "Should return 5 schemes starting from offset 5"
+        
+        # Ensure no overlap between first and second page
+        first_page_ids = {s.scheme_id for s in limited_schemes}
+        second_page_ids = {s.scheme_id for s in offset_schemes}
+        assert first_page_ids.isdisjoint(second_page_ids), "Pages should not overlap"
+        
+        # Cleanup
+        for scheme in schemes:
+            SchemeRepository.delete_scheme(scheme.scheme_id)
+    
+    def test_delete_scheme(self):
+        """Test deleting a scheme"""
+        # Insert test scheme
+        scheme = Scheme(
+            scheme_id="test_delete_001",
+            scheme_name="Scheme to Delete",
+            description="This scheme will be deleted",
+            category=SchemeCategory.OTHER,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Temporary benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/delete",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        SchemeRepository.insert_scheme(scheme)
+        
+        # Verify scheme exists
+        retrieved = SchemeRepository.get_scheme_by_id("test_delete_001")
+        assert retrieved is not None, "Scheme should exist before deletion"
+        
+        # Delete scheme
+        result = SchemeRepository.delete_scheme("test_delete_001")
+        assert result, "Scheme deletion should succeed"
+        
+        # Verify scheme no longer exists
+        retrieved = SchemeRepository.get_scheme_by_id("test_delete_001")
+        assert retrieved is None, "Scheme should not exist after deletion"
+    
+    def test_search_schemes_combined_filters(self):
+        """Test searching schemes with multiple filters combined"""
+        # Insert test schemes with different combinations
+        scheme1 = Scheme(
+            scheme_id="test_combined_001",
+            scheme_name="Combined Filter Scheme 1",
+            description="Active agriculture scheme for Maharashtra",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["MAHARASHTRA"],
+            benefits="State agriculture benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/combined1",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme2 = Scheme(
+            scheme_id="test_combined_002",
+            scheme_name="Combined Filter Scheme 2",
+            description="Active education scheme for Karnataka",
+            category=SchemeCategory.EDUCATION,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["KARNATAKA"],
+            benefits="State education benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/combined2",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        scheme3 = Scheme(
+            scheme_id="test_combined_003",
+            scheme_name="Combined Filter Scheme 3",
+            description="Expired agriculture scheme for Maharashtra",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.STATE,
+            applicable_states=["MAHARASHTRA"],
+            benefits="State agriculture benefits",
+            application_process="Apply online",
+            official_url="https://example.gov.in/combined3",
+            status=SchemeStatus.EXPIRED,
+            end_date=datetime(2020, 1, 1)
+        )
+        
+        SchemeRepository.insert_scheme(scheme1)
+        SchemeRepository.insert_scheme(scheme2)
+        SchemeRepository.insert_scheme(scheme3)
+        
+        # Test combined filters: category=agriculture, state=maharashtra, status=active
+        results = SchemeRepository.search_schemes(
+            category="agriculture",
+            state="maharashtra",
+            status="active"
+        )
+        
+        assert len(results) == 1, "Should find exactly one scheme matching all filters"
+        assert results[0].scheme_id == "test_combined_001"
+        assert results[0].category == SchemeCategory.AGRICULTURE
+        assert results[0].status == SchemeStatus.ACTIVE
+        
+        # Test combined filters: category=education, state=karnataka, status=active
+        results = SchemeRepository.search_schemes(
+            category="education",
+            state="karnataka",
+            status="active"
+        )
+        
+        assert len(results) == 1, "Should find exactly one scheme matching all filters"
+        assert results[0].scheme_id == "test_combined_002"
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_combined_001")
+        SchemeRepository.delete_scheme("test_combined_002")
+        SchemeRepository.delete_scheme("test_combined_003")
+    
+    def test_get_scheme_translations_missing_language(self):
+        """Test retrieving scheme translations for unsupported language"""
+        # Insert scheme with only Hindi translations
+        scheme = Scheme(
+            scheme_id="test_missing_lang_001",
+            scheme_name="Test Scheme",
+            scheme_name_translations={"hi": "परीक्षण योजना"},
+            description="Test description",
+            description_translations={"hi": "परीक्षण विवरण"},
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Test benefits",
+            benefits_translations={"hi": "परीक्षण लाभ"},
+            application_process="Test process",
+            application_process_translations={"hi": "परीक्षण प्रक्रिया"},
+            official_url="https://example.gov.in/test",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        SchemeRepository.insert_scheme(scheme)
+        
+        # Request Tamil translations (not available)
+        translations = SchemeRepository.get_scheme_translations("test_missing_lang_001", "ta")
+        assert translations is not None
+        # Should fall back to English
+        assert translations["scheme_name"] == "Test Scheme"
+        assert translations["description"] == "Test description"
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_missing_lang_001")
+    
+    def test_update_scheme_invalidates_cache(self):
+        """Test that updating a scheme invalidates the cache"""
+        # Insert test scheme
+        scheme = Scheme(
+            scheme_id="test_cache_001",
+            scheme_name="Original Name",
+            description="Original description",
+            category=SchemeCategory.AGRICULTURE,
+            authority=SchemeAuthority.CENTRAL,
+            applicable_states=["ALL"],
+            benefits="Original benefits",
+            application_process="Original process",
+            official_url="https://example.gov.in/cache",
+            status=SchemeStatus.ACTIVE
+        )
+        
+        SchemeRepository.insert_scheme(scheme)
+        
+        # Get scheme (should be cached)
+        retrieved1 = SchemeRepository.get_scheme_by_id("test_cache_001")
+        assert retrieved1 is not None
+        assert retrieved1.scheme_name == "Original Name"
+        
+        # Update scheme
+        updates = {"scheme_name": "Updated Name"}
+        SchemeRepository.update_scheme("test_cache_001", updates)
+        
+        # Get scheme again (should get updated version, not cached)
+        retrieved2 = SchemeRepository.get_scheme_by_id("test_cache_001")
+        assert retrieved2 is not None
+        assert retrieved2.scheme_name == "Updated Name"
+        
+        # Cleanup
+        SchemeRepository.delete_scheme("test_cache_001")
 
 
 class TestRedisSessionStore:

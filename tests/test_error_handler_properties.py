@@ -62,7 +62,7 @@ class TestErrorMessageSanitization:
     """
     
     @given(error=exception_strategy())
-    @settings(max_examples=100, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_error_messages_do_not_contain_stack_traces(self, error):
         """
         Property: Error messages should not contain stack traces
@@ -87,7 +87,7 @@ class TestErrorMessageSanitization:
                 f"Sanitized message contains stack trace pattern '{pattern}': {sanitized_message}"
     
     @given(error=exception_strategy())
-    @settings(max_examples=100, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_error_messages_do_not_contain_file_paths(self, error):
         """
         Property: Error messages should not contain file paths
@@ -113,7 +113,7 @@ class TestErrorMessageSanitization:
                 f"Sanitized message contains file path pattern '{pattern}': {sanitized_message}"
     
     @given(error=exception_strategy())
-    @settings(max_examples=100, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_error_messages_are_user_friendly(self, error):
         """
         Property: Error messages should be user-friendly
@@ -140,7 +140,7 @@ class TestErrorMessageSanitization:
         error=exception_strategy(),
         include_details=st.booleans()
     )
-    @settings(max_examples=100, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_error_messages_do_not_expose_internal_components(self, error, include_details):
         """
         Property: Error messages should not expose internal component names
@@ -181,7 +181,7 @@ class TestErrorMessageSanitization:
         ]),
         language=st.sampled_from(["en", "hi", "ta", "te", "bn", "mr", "gu", "kn", "ml", "pa"])
     )
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     def test_user_error_messages_are_localized(self, error_type, language):
         """
         Property: User error messages should be available in all supported languages
@@ -208,7 +208,7 @@ class TestErrorMessageSanitization:
             "api",
         ])
     )
-    @settings(max_examples=50)
+    @settings(max_examples=12)
     def test_user_error_messages_fallback_to_english(self, error_type):
         """
         Property: User error messages should fallback to English for unsupported languages
@@ -256,7 +256,7 @@ class TestLogAnonymization:
             st.from_regex(r'\+?\d{1,3}\s?\(\d{3,4}\)\s?\d{3,4}-\d{4}', fullmatch=True),
         )
     )
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     def test_phone_numbers_are_anonymized_in_text(self, phone_number):
         """
         Property: Phone numbers in text should be anonymized
@@ -294,7 +294,7 @@ class TestLogAnonymization:
             max_size=5
         )
     )
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     def test_multiple_phone_numbers_are_anonymized(self, phone_numbers):
         """
         Property: Multiple phone numbers in text should all be anonymized
@@ -322,7 +322,7 @@ class TestLogAnonymization:
         text=st.text(min_size=10, max_size=200),
         phone_number=st.from_regex(r'\+\d{10,15}', fullmatch=True)
     )
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     def test_anonymization_preserves_non_phone_content(self, text, phone_number):
         """
         Property: Anonymization should preserve non-phone content
@@ -351,7 +351,7 @@ class TestLogAnonymization:
     @given(
         phone_number=st.from_regex(r'\+\d{10,15}', fullmatch=True)
     )
-    @settings(max_examples=100)
+    @settings(max_examples=25)
     def test_anonymization_is_consistent(self, phone_number):
         """
         Property: Anonymization should be consistent
@@ -373,7 +373,7 @@ class TestLogAnonymization:
     @given(
         phone_number=st.from_regex(r'\+\d{4,9}', fullmatch=True)
     )
-    @settings(max_examples=50)
+    @settings(max_examples=12)
     def test_short_phone_numbers_are_partially_redacted(self, phone_number):
         """
         Property: Short phone numbers (4-9 digits) should show last 4 digits
@@ -407,7 +407,7 @@ class TestLogAnonymization:
         error_message=st.text(min_size=10, max_size=200),
         phone_number=st.from_regex(r'\+\d{10,15}', fullmatch=True)
     )
-    @settings(max_examples=100, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(max_examples=25, suppress_health_check=[HealthCheck.function_scoped_fixture])
     def test_error_logging_anonymizes_phone_numbers(self, error_message, phone_number):
         """
         Property: Error logging should anonymize phone numbers

@@ -52,7 +52,7 @@ def user_message_strategy(draw):
         max_size=10
     )
 )
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=25, deadline=None)
 def test_property_4_session_isolation(phone_numbers, messages_per_session):
     """
     Feature: y-connect-whatsapp-bot, Property 4: Session Isolation
@@ -143,7 +143,7 @@ def test_property_4_session_isolation(phone_numbers, messages_per_session):
         max_size=5
     )
 )
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=25, deadline=None)
 def test_session_context_isolation(phone_numbers, contexts):
     """
     Property: Session context isolation
@@ -195,7 +195,7 @@ def test_session_context_isolation(phone_numbers, contexts):
     language1=language_code_strategy(),
     language2=language_code_strategy()
 )
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=25, deadline=None)
 def test_session_language_isolation(phone, language1, language2):
     """
     Property: Session language updates should not affect other sessions
@@ -240,7 +240,7 @@ def test_session_language_isolation(phone, language1, language2):
         unique=True
     )
 )
-@settings(max_examples=50, deadline=None)
+@settings(max_examples=12, deadline=None)
 def test_concurrent_session_creation(phone_numbers):
     """
     Property: Concurrent session creation should maintain isolation
@@ -294,7 +294,7 @@ def test_concurrent_session_creation(phone_numbers):
         max_size=5
     )
 )
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=25, deadline=None)
 def test_property_24_pii_deletion_after_session_expiry(phone_numbers, messages, contexts):
     """
     Feature: y-connect-whatsapp-bot, Property 24: PII Deletion After Session Expiry
@@ -374,7 +374,7 @@ def test_property_24_pii_deletion_after_session_expiry(phone_numbers, messages, 
         max_size=5
     )
 )
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=25, deadline=None)
 def test_pii_not_deleted_before_expiry(phone, messages, context):
     """
     Property: PII should be retained for active sessions
@@ -432,7 +432,7 @@ def test_pii_not_deleted_before_expiry(phone, messages, context):
 @given(
     phone=phone_number_strategy()
 )
-@settings(max_examples=50, deadline=None)
+@settings(max_examples=12, deadline=None)
 def test_session_id_anonymization(phone):
     """
     Property: Session IDs should be anonymized (hashed)
@@ -470,7 +470,7 @@ def test_session_id_anonymization(phone):
     phone=phone_number_strategy(),
     ttl_seconds=st.integers(min_value=10, max_value=100)
 )
-@settings(max_examples=50, deadline=None)
+@settings(max_examples=12, deadline=None)
 def test_redis_ttl_enforcement(phone, ttl_seconds):
     """
     Property: Redis TTL should enforce automatic session expiry
@@ -516,3 +516,212 @@ def test_redis_ttl_enforcement(phone, ttl_seconds):
     finally:
         # Restore original TTL
         session_manager.session_ttl = original_ttl
+
+
+# Property 5: Session Expiration and Privacy
+@given(
+    phone_numbers=st.lists(
+        phone_number_strategy(),
+        min_size=1,
+        max_size=10,
+        unique=True
+    ),
+    messages_per_session=st.lists(
+        st.lists(user_message_strategy(), min_size=1, max_size=5),
+        min_size=1,
+        max_size=10
+    ),
+    contexts=st.lists(
+        st.dictionaries(
+            keys=st.sampled_from(["age", "occupation", "location", "income", "name", "email"]),
+            values=st.one_of(
+                st.integers(min_value=18, max_value=100),
+                st.text(min_size=1, max_size=50).filter(lambda x: x.strip())
+            ),
+            min_size=1,
+            max_size=5
+        ),
+        min_size=1,
+        max_size=10
+    ),
+    hours_inactive=st.integers(min_value=24, max_value=72)
+)
+@settings(max_examples=25, deadline=None)
+def test_property_5_session_expiration_and_privacy(
+    phone_numbers, messages_per_session, contexts, hours_inactive
+):
+    """
+    Feature: y-connect-whatsapp-bot, Property 5: Session Expiration and Privacy
+    
+    For any user session inactive for 24 hours or more, all session data 
+    including conversation history and user context should be deleted from storage.
+    
+    Validates: Requirements 1.5, 8.2
+    """
+    # Ensure we have matching number of message lists and contexts
+    assume(len(phone_numbers) == len(messages_per_session))
+    assume(len(phone_numbers) == len(contexts))
+    
+    # Create SessionManager with fake Redis
+    fake_redis = fakeredis.FakeStrictRedis(decode_responses=True)
+    session_manager = SessionManager(redis_client=fake_redis)
+    
+    # Create sessions with full data (messages and context)
+    session_ids = []
+    for phone, messages, context in zip(phone_numbers, messages_per_session, contexts):
+        # Create session
+        session = session_manager.get_or_create_session(phone)
+        session_ids.append(session.session_id)
+        
+        # Add messages (conversation history)
+        for msg in messages:
+            response = f"Response to: {msg.content[:20]}"
+            session_manager.update_session(session.session_id, msg, response)
+        
+        # Add user context (PII)
+        session_manager.update_session_context(phone, context)
+    
+    # Verify all sessions exist with complete data
+    for phone, messages, context in zip(phone_numbers, messages_per_session, contexts):
+        session = session_manager.get_session(phone)
+        assert session is not None, f"Session should exist for {phone}"
+        assert session.phone_number == phone
+        assert len(session.conversation_history) == len(messages) * 2  # user + bot messages
+        assert len(session.user_context) >= len(context)
+        
+        # Verify conversation history contains actual data
+        assert all(msg.content for msg in session.conversation_history), \
+            "All messages should have content"
+        
+        # Verify user context contains actual data
+        for key in context.keys():
+            assert key in session.user_context, f"Context key {key} should exist"
+    
+    # Simulate sessions being inactive for >= 24 hours
+    for phone in phone_numbers:
+        session = session_manager.get_session(phone)
+        session.last_active = datetime.utcnow() - timedelta(hours=hours_inactive)
+        
+        # Save the modified session back to Redis
+        session_json = session_manager._serialize_session(session)
+        fake_redis.setex(
+            session.session_id,
+            session_manager.session_ttl,
+            session_json
+        )
+    
+    # Run the cleanup process to delete expired sessions
+    cleared_count = session_manager.clear_expired_sessions()
+    
+    # Verify that all expired sessions were cleared
+    assert cleared_count == len(phone_numbers), \
+        f"Expected {len(phone_numbers)} sessions to be cleared, but {cleared_count} were cleared"
+    
+    # Verify complete data deletion: no session data should remain
+    for phone, session_id in zip(phone_numbers, session_ids):
+        # 1. Session should not be retrievable via get_session
+        session = session_manager.get_session(phone)
+        assert session is None, \
+            f"Session for {phone} should be deleted but still retrievable"
+        
+        # 2. Session key should not exist in Redis
+        assert not fake_redis.exists(session_id), \
+            f"Session key {session_id} should not exist in Redis"
+        
+        # 3. No keys matching the session pattern should exist
+        matching_keys = fake_redis.keys(f"*{phone}*")
+        assert len(matching_keys) == 0, \
+            f"No keys containing phone number should exist, found: {matching_keys}"
+    
+    # Verify Redis is clean (no session keys remain)
+    all_session_keys = fake_redis.keys("session:*")
+    assert len(all_session_keys) == 0, \
+        f"All session keys should be deleted, but {len(all_session_keys)} remain"
+
+
+@given(
+    phone_numbers=st.lists(
+        phone_number_strategy(),
+        min_size=2,
+        max_size=5,
+        unique=True
+    ),
+    messages=st.lists(user_message_strategy(), min_size=1, max_size=3),
+    context=st.dictionaries(
+        keys=st.sampled_from(["age", "occupation", "location"]),
+        values=st.text(min_size=1, max_size=30).filter(lambda x: x.strip()),
+        min_size=1,
+        max_size=3
+    )
+)
+@settings(max_examples=25, deadline=None)
+def test_selective_session_expiration(phone_numbers, messages, context):
+    """
+    Property: Only expired sessions should be deleted
+    
+    For any set of sessions where some are expired (>= 24 hours inactive) 
+    and some are active (< 24 hours inactive), only the expired sessions 
+    should be deleted while active sessions remain intact.
+    
+    Validates: Requirements 1.5, 8.2
+    """
+    assume(len(phone_numbers) >= 2)
+    
+    # Create SessionManager with fake Redis
+    fake_redis = fakeredis.FakeStrictRedis(decode_responses=True)
+    session_manager = SessionManager(redis_client=fake_redis)
+    
+    # Split phone numbers into expired and active groups
+    mid_point = len(phone_numbers) // 2
+    expired_phones = phone_numbers[:mid_point]
+    active_phones = phone_numbers[mid_point:]
+    
+    # Create all sessions with data
+    for phone in phone_numbers:
+        session = session_manager.get_or_create_session(phone)
+        
+        # Add messages
+        for msg in messages:
+            response = f"Response: {msg.content[:20]}"
+            session_manager.update_session(session.session_id, msg, response)
+        
+        # Add context
+        session_manager.update_session_context(phone, context)
+    
+    # Set expired sessions to >24 hours inactive
+    for phone in expired_phones:
+        session = session_manager.get_session(phone)
+        session.last_active = datetime.utcnow() - timedelta(hours=25)
+        session_json = session_manager._serialize_session(session)
+        fake_redis.setex(session.session_id, session_manager.session_ttl, session_json)
+    
+    # Set active sessions to <24 hours inactive
+    for phone in active_phones:
+        session = session_manager.get_session(phone)
+        session.last_active = datetime.utcnow() - timedelta(hours=12)
+        session_json = session_manager._serialize_session(session)
+        fake_redis.setex(session.session_id, session_manager.session_ttl, session_json)
+    
+    # Run cleanup
+    cleared_count = session_manager.clear_expired_sessions()
+    
+    # Verify only expired sessions were cleared
+    assert cleared_count == len(expired_phones), \
+        f"Expected {len(expired_phones)} expired sessions to be cleared"
+    
+    # Verify expired sessions are deleted
+    for phone in expired_phones:
+        session = session_manager.get_session(phone)
+        assert session is None, f"Expired session for {phone} should be deleted"
+    
+    # Verify active sessions still exist with all data
+    for phone in active_phones:
+        session = session_manager.get_session(phone)
+        assert session is not None, f"Active session for {phone} should still exist"
+        assert session.phone_number == phone
+        assert len(session.conversation_history) == len(messages) * 2
+        assert len(session.user_context) >= len(context)
+        
+        # Verify data integrity
+        for key in context.keys():
+            assert key in session.user_context

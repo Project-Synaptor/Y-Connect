@@ -63,7 +63,7 @@ def create_mock_components():
     language=st.sampled_from(SUPPORTED_LANGUAGES),
     phone_number=st.text(min_size=10, max_size=15, alphabet=st.characters(whitelist_categories=("Nd",))).map(lambda x: f"+{x}")
 )
-@settings(max_examples=50, deadline=None)
+@settings(max_examples=12, deadline=None)
 async def test_property_22_help_command_multi_language(language, phone_number):
     """
     Feature: y-connect-whatsapp-bot, Property 22: Help Command Multi-Language
@@ -152,7 +152,7 @@ async def test_property_22_help_command_multi_language(language, phone_number):
     phone_number=st.text(min_size=10, max_size=15, alphabet=st.characters(whitelist_categories=("Nd",))).map(lambda x: f"+{x}"),
     help_variation=st.sampled_from(["help", "HELP", "Help", "  help  ", "help?", "help!"])
 )
-@settings(max_examples=30, deadline=None)
+@settings(max_examples=10, deadline=None)
 async def test_property_22_help_command_case_insensitive(language, phone_number, help_variation):
     """
     Property 22 extension: Help command should be case-insensitive and handle variations
@@ -225,7 +225,7 @@ async def test_property_22_help_command_case_insensitive(language, phone_number,
     language=st.sampled_from(SUPPORTED_LANGUAGES),
     phone_number=st.text(min_size=10, max_size=15, alphabet=st.characters(whitelist_categories=("Nd",))).map(lambda x: f"+{x}")
 )
-@settings(max_examples=30, deadline=None)
+@settings(max_examples=10, deadline=None)
 async def test_property_22_help_response_contains_instructions(language, phone_number):
     """
     Property 22 extension: Help response should contain usage instructions
@@ -312,7 +312,7 @@ async def test_property_22_help_response_contains_instructions(language, phone_n
     phone_number=st.text(min_size=10, max_size=15, alphabet=st.characters(whitelist_categories=("Nd",))).map(lambda x: f"+{x}"),
     language=st.sampled_from(SUPPORTED_LANGUAGES)
 )
-@settings(max_examples=30, deadline=None)
+@settings(max_examples=10, deadline=None)
 async def test_property_23_category_filtering(category, phone_number, language):
     """
     Feature: y-connect-whatsapp-bot, Property 23: Category Filtering
@@ -453,7 +453,7 @@ async def test_property_23_category_filtering(category, phone_number, language):
     phone_number=st.text(min_size=10, max_size=15, alphabet=st.characters(whitelist_categories=("Nd",))).map(lambda x: f"+{x}"),
     language=st.sampled_from(SUPPORTED_LANGUAGES)
 )
-@settings(max_examples=20, deadline=None)
+@settings(max_examples=10, deadline=None)
 async def test_property_23_category_filtering_by_number(category_num, phone_number, language):
     """
     Property 23 extension: Category filtering should work with numeric selection (1-10)

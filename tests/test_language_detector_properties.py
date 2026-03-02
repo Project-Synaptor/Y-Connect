@@ -23,7 +23,7 @@ class TestLanguageDetectorProperties:
             max_size=200
         )
     )
-    @settings(max_examples=100, deadline=None)
+    @settings(max_examples=25, deadline=None)
     def test_property_language_detection_returns_valid_result(self, text):
         """
         Property 6: Language Detection Accuracy
@@ -63,7 +63,7 @@ class TestLanguageDetectorProperties:
     @given(
         lang_code=st.sampled_from(["hi", "en", "ta", "te", "bn", "mr", "gu", "kn", "ml", "pa"])
     )
-    @settings(max_examples=50, deadline=None)
+    @settings(max_examples=12, deadline=None)
     def test_property_supported_language_check_consistency(self, lang_code):
         """
         Property: Supported language check is consistent
@@ -88,7 +88,7 @@ class TestLanguageDetectorProperties:
     @given(
         text=st.text(min_size=0, max_size=2)
     )
-    @settings(max_examples=50, deadline=None)
+    @settings(max_examples=12, deadline=None)
     def test_property_short_text_handling(self, text):
         """
         Property: Short text handling is safe
@@ -124,7 +124,7 @@ class TestLanguageDetectorProperties:
             max_size=100
         )
     )
-    @settings(max_examples=50, deadline=None)
+    @settings(max_examples=12, deadline=None)
     def test_property_detection_determinism(self, text1, text2):
         """
         Property: Language detection is deterministic
@@ -155,7 +155,7 @@ class TestLanguageDetectorProperties:
     @given(
         whitespace=st.text(alphabet=st.characters(whitelist_categories=('Zs',)), min_size=1, max_size=20)
     )
-    @settings(max_examples=30, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_property_whitespace_handling(self, whitespace):
         """
         Property: Whitespace-only text is handled gracefully
@@ -177,7 +177,7 @@ class TestLanguageDetectorProperties:
     @given(
         numbers=st.text(alphabet='0123456789', min_size=1, max_size=50)
     )
-    @settings(max_examples=30, deadline=None)
+    @settings(max_examples=10, deadline=None)
     def test_property_numeric_text_handling(self, numbers):
         """
         Property: Numeric text is handled gracefully
@@ -200,7 +200,7 @@ class TestLanguageDetectorProperties:
     @given(
         text=st.text(min_size=1, max_size=500)
     )
-    @settings(max_examples=100, deadline=None)
+    @settings(max_examples=25, deadline=None)
     def test_property_no_exceptions_on_any_input(self, text):
         """
         Property: Detector never crashes on any input

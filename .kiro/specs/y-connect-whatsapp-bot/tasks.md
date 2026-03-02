@@ -58,7 +58,7 @@ The implementation follows a bottom-up approach: core data models → individual
     - Write insert_scheme() for adding new schemes
     - _Requirements: 5.1, 5.3_
   
-  - [ ] 3.3 Write unit tests for database operations
+  - [x] 3.3 Write unit tests for database operations
     - Test CRUD operations with sample schemes
     - Test filtering by category, state, status
     - Test translation retrieval
@@ -70,7 +70,7 @@ The implementation follows a bottom-up approach: core data models → individual
     - Implement session retrieval and update operations
     - _Requirements: 1.4, 1.5_
   
-  - [ ] 3.5 Write property test for session expiration
+  - [x] 3.5 Write property test for session expiration
     - **Property 5: Session Expiration and Privacy**
     - **Validates: Requirements 1.5, 8.2**
 
@@ -478,7 +478,7 @@ The implementation follows a bottom-up approach: core data models → individual
     - Create deployment checklist
     - _Requirements: All (deployment)_
 
-- [ ] 22. Final checkpoint - Run full test suite
+- [x] 22. Final checkpoint - Run full test suite
   - Run all unit tests and property tests
   - Run integration tests with mocked services
   - Run performance tests with load simulation

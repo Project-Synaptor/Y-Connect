@@ -156,8 +156,8 @@ class RAGEngine:
         Rerank retrieved documents based on user context
         
         Applies:
+        - Active scheme prioritization (applied first to ensure boost)
         - Eligibility filtering (age, location, occupation, income, gender)
-        - Active scheme prioritization
         - Relevance score adjustment
         
         Args:
@@ -173,21 +173,23 @@ class RAGEngine:
         scored_candidates = []
         
         for doc in candidates:
-            # Start with similarity score
-            score = doc.similarity_score
+            # Start with similarity score (preserve original)
+            original_score = doc.similarity_score
+            score = original_score
             
-            # Apply eligibility boost/penalty
+            # Apply active scheme boost FIRST (before eligibility)
+            # This ensures active schemes always get boosted
+            if doc.scheme.status == SchemeStatus.ACTIVE:
+                score *= 1.5  # 50% boost for active schemes
+            elif doc.scheme.status == SchemeStatus.EXPIRED:
+                score *= 0.5  # 50% penalty for expired schemes
+            
+            # Then apply eligibility boost/penalty
             eligibility_score = self._calculate_eligibility_score(
                 doc.scheme,
                 query.entities
             )
             score *= eligibility_score
-            
-            # Boost active schemes
-            if doc.scheme.status == SchemeStatus.ACTIVE:
-                score *= 1.2  # 20% boost for active schemes
-            elif doc.scheme.status == SchemeStatus.EXPIRED:
-                score *= 0.5  # 50% penalty for expired schemes
             
             # Store adjusted score
             doc.similarity_score = score
@@ -324,75 +326,89 @@ class RAGEngine:
         """
         Calculate eligibility score based on user context
         
+        Uses additive scoring instead of multiplicative to ensure
+        matching schemes always rank higher than non-matching ones.
+        
         Args:
             scheme: Scheme to evaluate
             user_context: User's context (age, location, occupation, etc.)
             
         Returns:
-            Eligibility score multiplier (0.5 to 1.5)
+            Eligibility score multiplier (0.3 to 2.5)
         """
-        score = 1.0
+        # If no user context, return neutral score
+        if not user_context:
+            return 1.0
+        
+        # Start with base score
+        base_score = 1.0
+        boost = 0.0
+        penalty = 0.0
+        
         eligibility = scheme.eligibility_criteria
         
-        if not eligibility:
-            return score
-        
-        # Check age eligibility
-        if "age" in user_context and "age_min" in eligibility:
-            user_age = user_context["age"]
-            age_min = eligibility.get("age_min", 0)
-            age_max = eligibility.get("age_max", 120)
-            
-            if age_min <= user_age <= age_max:
-                score *= 1.2  # Boost if age matches
-            else:
-                score *= 0.6  # Penalty if age doesn't match
-        
-        # Check location eligibility
+        # Check location eligibility (based on scheme.applicable_states)
         if "location" in user_context:
             user_location = user_context["location"]
             applicable_states = scheme.applicable_states
             
             if "ALL" in applicable_states or user_location in applicable_states:
-                score *= 1.1  # Boost if location matches
+                boost += 0.5  # Strong boost for location match
             else:
-                score *= 0.7  # Penalty if location doesn't match
+                penalty += 0.4  # Penalty if location doesn't match
         
-        # Check occupation eligibility
-        if "occupation" in user_context and "occupation" in eligibility:
-            required_occupation = eligibility["occupation"]
-            user_occupation = user_context["occupation"]
-            
-            if isinstance(required_occupation, list):
-                if user_occupation in required_occupation:
-                    score *= 1.3  # Strong boost for occupation match
+        # Check other eligibility criteria only if they exist
+        if eligibility:
+            # Check age eligibility
+            if "age" in user_context and "age_min" in eligibility:
+                user_age = user_context["age"]
+                age_min = eligibility.get("age_min", 0)
+                age_max = eligibility.get("age_max", 120)
+                
+                if age_min <= user_age <= age_max:
+                    boost += 0.6  # Strong boost for age match
                 else:
-                    score *= 0.8
-            elif user_occupation == required_occupation:
-                score *= 1.3
-            else:
-                score *= 0.8
-        
-        # Check gender eligibility
-        if "gender" in user_context and "gender" in eligibility:
-            required_gender = eligibility["gender"]
-            user_gender = user_context["gender"]
+                    penalty += 0.5  # Penalty if age doesn't match
             
-            if required_gender == "any" or user_gender == required_gender:
-                score *= 1.1
-            else:
-                score *= 0.7
-        
-        # Check income eligibility
-        if "income" in user_context and "income_category" in eligibility:
-            user_income = user_context["income"]
-            required_income = eligibility["income_category"]
+            # Check occupation eligibility
+            if "occupation" in user_context and "occupation" in eligibility:
+                required_occupation = eligibility["occupation"]
+                user_occupation = user_context["occupation"]
+                
+                occupation_match = False
+                if isinstance(required_occupation, list):
+                    occupation_match = user_occupation in required_occupation
+                else:
+                    occupation_match = user_occupation == required_occupation
+                
+                if occupation_match:
+                    boost += 0.7  # Very strong boost for occupation match
+                else:
+                    penalty += 0.4  # Penalty for occupation mismatch
             
-            if user_income == required_income:
-                score *= 1.2
+            # Check gender eligibility
+            if "gender" in user_context and "gender" in eligibility:
+                required_gender = eligibility["gender"]
+                user_gender = user_context["gender"]
+                
+                if required_gender == "any" or user_gender == required_gender:
+                    boost += 0.4  # Boost for gender match
+                else:
+                    penalty += 0.4  # Penalty if gender doesn't match
+            
+            # Check income eligibility
+            if "income" in user_context and "income_category" in eligibility:
+                user_income = user_context["income"]
+                required_income = eligibility["income_category"]
+                
+                if user_income == required_income:
+                    boost += 0.5  # Boost for income match
         
-        # Clamp score between 0.5 and 1.5
-        return max(0.5, min(1.5, score))
+        # Calculate final score: base + boost - penalty
+        final_score = base_score + boost - penalty
+        
+        # Clamp score between 0.3 and 2.5
+        return max(0.3, min(2.5, final_score))
     
     def _build_prompt(
         self,
