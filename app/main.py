@@ -3,6 +3,7 @@
 from fastapi import FastAPI, Request, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, Response, JSONResponse
+from twilio.twiml.messaging_response import MessagingResponse
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -287,6 +288,36 @@ async def webhook_message(request: Request):
         
         # Track error for alerting
         alert_manager.track_request_error(is_error)
+
+# --- TWILIO SANDBOX TESTING ENDPOINT ---
+
+@app.post("/twilio")
+async def twilio_webhook(request: Request):
+    """
+    Temporary webhook endpoint for Twilio Sandbox testing.
+    Bypasses Meta's signature verification and parses Form Data.
+    """
+    logger = get_logger(__name__)
+    
+    try:
+        # Twilio sends form data, NOT JSON
+        form_data = await request.form()
+        incoming_msg = form_data.get('Body', '')
+        sender_number = form_data.get('From', '')
+        
+        logger.info(f"Twilio Sandbox received: '{incoming_msg}' from {sender_number}")
+
+        # TEMPORARY: Echo response to prove it works
+        # Later, you will pass 'incoming_msg' to your AI/RAG logic here
+        twiml_response = MessagingResponse()
+        reply = twiml_response.message()
+        reply.body(f"Namaste from Y-Connect! We received your message: '{incoming_msg}'.")
+
+        return Response(content=str(twiml_response), media_type="application/xml")
+        
+    except Exception as e:
+        logger.error(f"Twilio webhook error: {e}")
+        raise HTTPException(status_code=500, detail="Twilio processing failed")
 
 
 if __name__ == "__main__":
