@@ -301,7 +301,7 @@ bedrock_client = boto3.client(
 
 def ask_yconnect_brain(user_message: str) -> str:
     """Sends the user's message to Claude 3 Haiku on AWS Bedrock."""
-    model_id = 'anthropic.claude-3-haiku-20240307-v1:0'
+    model_id = 'us.anthropic.claude-3-haiku-20240307-v1:0'
     
     # Format required by Claude 3 Messages API
     body = json.dumps({
