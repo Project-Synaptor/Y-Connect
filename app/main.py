@@ -1,5 +1,7 @@
 """Main FastAPI application for Y-Connect WhatsApp Bot"""
-
+import boto3
+import json
+import os
 from fastapi import FastAPI, Request, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, Response, JSONResponse
@@ -289,29 +291,64 @@ async def webhook_message(request: Request):
         # Track error for alerting
         alert_manager.track_request_error(is_error)
 
+# Initialize the Bedrock client
+bedrock_client = boto3.client(
+    service_name='bedrock-runtime',
+    region_name=os.getenv('AWS_REGION', 'ap-south-2'),
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+)
+
+def ask_yconnect_brain(user_message: str) -> str:
+    """Sends the user's message to Claude 3 Haiku on AWS Bedrock."""
+    model_id = 'anthropic.claude-3-haiku-20240307-v1:0'
+    
+    # Format required by Claude 3 Messages API
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 512,
+        "temperature": 0.5,
+        "system": "You are Y-Connect, a helpful, friendly AI assistant for rural India. Keep answers concise, clear, and easy to read on a mobile phone. If asked about government schemes, be precise.",
+        "messages": [
+            {
+                "role": "user",
+                "content": [{"type": "text", "text": user_message}]
+            }
+        ]
+    })
+
+    try:
+        response = bedrock_client.invoke_model(
+            modelId=model_id,
+            body=body,
+            accept='application/json',
+            contentType='application/json'
+        )
+        response_body = json.loads(response.get('body').read())
+        return response_body['content'][0]['text']
+    except Exception as e:
+        print(f"Bedrock Error: {e}")
+        return "I'm sorry, I am having trouble connecting to the government database right now. Please try again in a moment."
+
 # --- TWILIO SANDBOX TESTING ENDPOINT ---
 
 @app.post("/twilio")
 async def twilio_webhook(request: Request):
-    """
-    Temporary webhook endpoint for Twilio Sandbox testing.
-    Bypasses Meta's signature verification and parses Form Data.
-    """
     logger = get_logger(__name__)
-    
     try:
-        # Twilio sends form data, NOT JSON
         form_data = await request.form()
         incoming_msg = form_data.get('Body', '')
         sender_number = form_data.get('From', '')
         
         logger.info(f"Twilio Sandbox received: '{incoming_msg}' from {sender_number}")
 
-        # TEMPORARY: Echo response to prove it works
-        # Later, you will pass 'incoming_msg' to your AI/RAG logic here
+        # --- THE BRAIN IS NOW ACTIVE ---
+        # We pass the WhatsApp message to Claude 3 Haiku
+        ai_reply = ask_yconnect_brain(incoming_msg)
+
         twiml_response = MessagingResponse()
         reply = twiml_response.message()
-        reply.body(f"Namaste from Y-Connect! We received your message: '{incoming_msg}'.")
+        reply.body(ai_reply)
 
         return Response(content=str(twiml_response), media_type="application/xml")
         
