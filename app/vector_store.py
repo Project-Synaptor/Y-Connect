@@ -210,13 +210,13 @@ class VectorStoreClient:
                 filter_conditions = self._build_filter(filters)
             
             # Perform search
-            search_results = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=query_vector,
-                limit=top_k,
-                query_filter=filter_conditions,
-                score_threshold=score_threshold,
-            )
+            search_results = self.client.query_points(
+               collection_name=self.collection_name,
+               query=query_vector,
+               limit=top_k,
+               query_filter=filter_conditions,
+               score_threshold=score_threshold,
+             ).points
             
             # Convert results to dict format
             results = []
