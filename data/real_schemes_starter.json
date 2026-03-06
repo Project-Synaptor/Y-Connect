@@ -1,0 +1,180 @@
+[
+  {
+    "scheme_id": "PM-KISAN-001",
+    "scheme_name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+    "scheme_name_translations": {
+      "hi": "प्रधानमंत्री किसान सम्मान निधि",
+      "ta": "பிரதம மந்திரி கிசான் சம்மான் நிதி",
+      "te": "ప్రధాన మంత్రి కిసాన్ సమ్మాన్ నిధి",
+      "bn": "প্রধানমন্ত্রী কিষাণ সম্মান নিধি",
+      "mr": "प्रधानमंत्री किसान सन्मान निधी"
+    },
+    "description": "PM-KISAN provides direct income support of ₹6,000 per year to all landholding farmer families across India. The amount is paid in three equal installments of ₹2,000 each, directly transferred to the bank accounts of beneficiaries. This scheme aims to supplement the financial needs of farmers for procuring various inputs and meeting other needs related to agriculture and allied activities.",
+    "description_translations": {
+      "hi": "पीएम-किसान भारत भर के सभी भूमिधारक किसान परिवारों को प्रति वर्ष ₹6,000 की प्रत्यक्ष आय सहायता प्रदान करता है। राशि तीन समान किस्तों में ₹2,000 प्रत्येक में भुगतान की जाती है, सीधे लाभार्थियों के बैंक खातों में स्थानांतरित की जाती है।"
+    },
+    "category": "agriculture",
+    "authority": "central",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "occupation": "farmer",
+      "land_holding": "any",
+      "age_min": 18
+    },
+    "benefits": "₹6,000 per year paid in three equal installments of ₹2,000 each. Amount directly transferred to farmer's bank account every four months.",
+    "benefits_translations": {
+      "hi": "प्रति वर्ष ₹6,000 तीन समान किस्तों में ₹2,000 प्रत्येक। राशि सीधे किसान के बैंक खाते में हर चार महीने में स्थानांतरित की जाती है।"
+    },
+    "application_process": "1. Visit PM-KISAN portal at pmkisan.gov.in\n2. Click on 'Farmers Corner' and select 'New Farmer Registration'\n3. Enter Aadhaar number and mobile number\n4. Fill the registration form with personal and land details\n5. Upload required documents: Aadhaar card, bank account details, land ownership documents\n6. Submit the form for verification by local revenue officials\n7. Once verified, amount will be credited to your bank account within 30 days",
+    "application_process_translations": {
+      "hi": "1. pmkisan.gov.in पर PM-KISAN पोर्टल पर जाएं\n2. 'किसान कॉर्नर' पर क्लिक करें और 'नया किसान पंजीकरण' चुनें\n3. आधार नंबर और मोबाइल नंबर दर्ज करें\n4. व्यक्तिगत और भूमि विवरण के साथ पंजीकरण फॉर्म भरें"
+    },
+    "official_url": "https://pmkisan.gov.in/",
+    "helpline_numbers": ["1800-180-1551", "011-23381092"],
+    "status": "active",
+    "start_date": "2019-02-01T00:00:00",
+    "end_date": null
+  },
+  {
+    "scheme_id": "AYUSHMAN-BHARAT-001",
+    "scheme_name": "Ayushman Bharat - Pradhan Mantri Jan Arogya Yojana (PM-JAY)",
+    "scheme_name_translations": {
+      "hi": "आयुष्मान भारत - प्रधानमंत्री जन आरोग्य योजना",
+      "ta": "ஆயுஷ்மான் பாரத் - பிரதம மந்திரி ஜன் ஆரோக்ய யோஜனா",
+      "te": "ఆయుష్మాన్ భారత్ - ప్రధాన మంత్రి జన్ ఆరోగ్య యోజన",
+      "bn": "আয়ুষ্মান ভারত - প্রধানমন্ত্রী জন আরোগ্য যোজনা",
+      "mr": "आयुष्मान भारत - प्रधानमंत्री जन आरोग्य योजना"
+    },
+    "description": "Ayushman Bharat PM-JAY is the world's largest health insurance scheme providing health coverage of ₹5 lakh per family per year for secondary and tertiary care hospitalization. It covers over 10 crore poor and vulnerable families (approximately 50 crore beneficiaries). The scheme provides cashless and paperless access to healthcare services in empanelled hospitals across India.",
+    "description_translations": {
+      "hi": "आयुष्मान भारत PM-JAY दुनिया की सबसे बड़ी स्वास्थ्य बीमा योजना है जो द्वितीयक और तृतीयक देखभाल अस्पताल में भर्ती के लिए प्रति परिवार प्रति वर्ष ₹5 लाख का स्वास्थ्य कवरेज प्रदान करती है।"
+    },
+    "category": "health",
+    "authority": "central",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "income_max": 500000,
+      "age_min": 0
+    },
+    "benefits": "Health insurance coverage of ₹5 lakh per family per year. Covers hospitalization expenses, pre and post-hospitalization expenses, and day care procedures. Cashless treatment at empanelled hospitals across India.",
+    "benefits_translations": {
+      "hi": "प्रति परिवार प्रति वर्ष ₹5 लाख का स्वास्थ्य बीमा कवरेज। अस्पताल में भर्ती खर्च, पूर्व और बाद के अस्पताल में भर्ती खर्च, और दिन की देखभाल प्रक्रियाओं को कवर करता है।"
+    },
+    "application_process": "1. Check eligibility on pmjay.gov.in by entering mobile number\n2. Visit nearest Ayushman Mitra or Common Service Centre (CSC)\n3. Provide Aadhaar card and family details for verification\n4. If eligible, Ayushman card will be generated on the spot\n5. Use the card at any empanelled hospital for cashless treatment\n6. No application fee or premium required",
+    "application_process_translations": {
+      "hi": "1. pmjay.gov.in पर मोबाइल नंबर दर्ज करके पात्रता जांचें\n2. निकटतम आयुष्मान मित्र या कॉमन सर्विस सेंटर (CSC) पर जाएं\n3. सत्यापन के लिए आधार कार्ड और परिवार का विवरण प्रदान करें"
+    },
+    "official_url": "https://pmjay.gov.in/",
+    "helpline_numbers": ["14555", "1800-111-565"],
+    "status": "active",
+    "start_date": "2018-09-23T00:00:00",
+    "end_date": null
+  },
+  {
+    "scheme_id": "PM-AWAS-GRAMIN-001",
+    "scheme_name": "Pradhan Mantri Awas Yojana - Gramin (PMAY-G)",
+    "scheme_name_translations": {
+      "hi": "प्रधानमंत्री आवास योजना - ग्रामीण",
+      "ta": "பிரதம மந்திரி ஆவாஸ் யோஜனா - கிராமீண்",
+      "te": "ప్రధాన మంత్రి ఆవాస్ యోజన - గ్రామీణ్",
+      "bn": "প্রধানমন্ত্রী আবাস যোজনা - গ্রামীণ",
+      "mr": "प्रधानमंत्री आवास योजना - ग्रामीण"
+    },
+    "description": "PMAY-Gramin aims to provide pucca houses with basic amenities to all houseless and households living in kutcha and dilapidated houses in rural areas. The scheme provides financial assistance of ₹1.20 lakh in plain areas and ₹1.30 lakh in hilly states, difficult areas, and Integrated Action Plan (IAP) districts. The unit assistance is shared between Central and State Government in the ratio 60:40 in plain areas and 90:10 for North Eastern and Himalayan States.",
+    "description_translations": {
+      "hi": "PMAY-ग्रामीण का उद्देश्य ग्रामीण क्षेत्रों में सभी बेघर और कच्चे और जर्जर घरों में रहने वाले परिवारों को बुनियादी सुविधाओं के साथ पक्के घर प्रदान करना है। यह योजना मैदानी क्षेत्रों में ₹1.20 लाख और पहाड़ी राज्यों में ₹1.30 लाख की वित्तीय सहायता प्रदान करती है।"
+    },
+    "category": "housing",
+    "authority": "central",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "housing_status": "houseless or kutcha house",
+      "income_max": 300000,
+      "age_min": 18
+    },
+    "benefits": "Financial assistance of ₹1.20 lakh in plain areas and ₹1.30 lakh in hilly/difficult areas. Assistance for construction of toilet with ₹12,000 from Swachh Bharat Mission-Gramin. 90/95 days of unskilled labour wages under MGNREGA. Assistance for piped drinking water, electricity connection, and LPG connection.",
+    "benefits_translations": {
+      "hi": "मैदानी क्षेत्रों में ₹1.20 लाख और पहाड़ी/कठिन क्षेत्रों में ₹1.30 लाख की वित्तीय सहायता। स्वच्छ भारत मिशन-ग्रामीण से शौचालय निर्माण के लिए ₹12,000 की सहायता।"
+    },
+    "application_process": "1. Beneficiaries are identified through Socio Economic and Caste Census (SECC) 2011 data\n2. Gram Sabha verifies the list of beneficiaries\n3. Selected beneficiaries register on PMAY-G portal or through Common Service Centre\n4. Submit Aadhaar, bank account details, and land ownership documents\n5. Approval by District Level Committee\n6. First installment released after foundation is laid\n7. Second installment after roof level construction\n8. Third installment after completion",
+    "application_process_translations": {
+      "hi": "1. लाभार्थियों की पहचान सामाजिक आर्थिक और जाति जनगणना (SECC) 2011 डेटा के माध्यम से की जाती है\n2. ग्राम सभा लाभार्थियों की सूची को सत्यापित करती है\n3. चयनित लाभार्थी PMAY-G पोर्टल पर या कॉमन सर्विस सेंटर के माध्यम से पंजीकरण करते हैं"
+    },
+    "official_url": "https://pmayg.nic.in/",
+    "helpline_numbers": ["1800-11-6446"],
+    "status": "active",
+    "start_date": "2016-04-01T00:00:00",
+    "end_date": null
+  },
+  {
+    "scheme_id": "MGNREGA-001",
+    "scheme_name": "Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA)",
+    "scheme_name_translations": {
+      "hi": "महात्मा गांधी राष्ट्रीय ग्रामीण रोजगार गारंटी अधिनियम",
+      "ta": "மகாத்மா காந்தி தேசிய கிராமப்புற வேலைவாய்ப்பு உத்தரவாத சட்டம்",
+      "te": "మహాత్మా గాంధీ జాతీయ గ్రామీణ ఉపాధి హామీ చట్టం",
+      "bn": "মহাত্মা গান্ধী জাতীয় গ্রামীণ কর্মসংস্থান গ্যারান্টি আইন",
+      "mr": "महात्मा गांधी राष्ट्रीय ग्रामीण रोजगार हमी कायदा"
+    },
+    "description": "MGNREGA is one of the largest work guarantee programmes in the world. The Act provides a legal guarantee for 100 days of employment in every financial year to adult members of any rural household willing to do public work-related unskilled manual work at the statutory minimum wage. The scheme aims to enhance livelihood security in rural areas by providing at least 100 days of guaranteed wage employment.",
+    "description_translations": {
+      "hi": "मनरेगा दुनिया के सबसे बड़े कार्य गारंटी कार्यक्रमों में से एक है। यह अधिनियम किसी भी ग्रामीण परिवार के वयस्क सदस्यों को प्रत्येक वित्तीय वर्ष में 100 दिनों के रोजगार की कानूनी गारंटी प्रदान करता है।"
+    },
+    "category": "employment",
+    "authority": "central",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "age_min": 18,
+      "occupation": "any"
+    },
+    "benefits": "Guaranteed 100 days of wage employment per household per year. Minimum wage varies by state (₹200-₹300 per day). Payment within 15 days of work completion. Unemployment allowance if work not provided within 15 days. Work provided within 5 km radius of residence.",
+    "benefits_translations": {
+      "hi": "प्रति परिवार प्रति वर्ष 100 दिनों के मजदूरी रोजगार की गारंटी। न्यूनतम मजदूरी राज्य के अनुसार भिन्न होती है (₹200-₹300 प्रति दिन)। कार्य पूर्ण होने के 15 दिनों के भीतर भुगतान।"
+    },
+    "application_process": "1. Apply at local Gram Panchayat office with photo and proof of residence\n2. Job card will be issued within 15 days of application\n3. Submit written application for work to Gram Panchayat or Programme Officer\n4. Work must be provided within 15 days of application\n5. If work not provided, unemployment allowance will be paid\n6. Wages paid directly to bank account or post office account\n7. Muster roll maintained for attendance and payment tracking",
+    "application_process_translations": {
+      "hi": "1. फोटो और निवास प्रमाण के साथ स्थानीय ग्राम पंचायत कार्यालय में आवेदन करें\n2. आवेदन के 15 दिनों के भीतर जॉब कार्ड जारी किया जाएगा\n3. ग्राम पंचायत या कार्यक्रम अधिकारी को काम के लिए लिखित आवेदन जमा करें"
+    },
+    "official_url": "https://nrega.nic.in/",
+    "helpline_numbers": ["1800-345-22-44"],
+    "status": "active",
+    "start_date": "2006-02-02T00:00:00",
+    "end_date": null
+  },
+  {
+    "scheme_id": "BBBP-001",
+    "scheme_name": "Beti Bachao Beti Padhao (BBBP)",
+    "scheme_name_translations": {
+      "hi": "बेटी बचाओ बेटी पढ़ाओ",
+      "ta": "பெண் குழந்தையைக் காப்பாற்றுங்கள் பெண் குழந்தைக்கு கல்வி கற்பியுங்கள்",
+      "te": "బాలికను రక్షించండి బాలికకు చదువు చెప్పండి",
+      "bn": "বেটি বাঁচাও বেটি পড়াও",
+      "mr": "बेटी बचाओ बेटी पढाओ"
+    },
+    "description": "Beti Bachao Beti Padhao is a social campaign aimed at generating awareness and improving the efficiency of welfare services intended for girls. The scheme addresses the declining Child Sex Ratio (CSR) and related issues of women empowerment through a national campaign focusing on prevention of gender biased sex selection and ensuring survival, protection and education of the girl child.",
+    "description_translations": {
+      "hi": "बेटी बचाओ बेटी पढ़ाओ एक सामाजिक अभियान है जिसका उद्देश्य जागरूकता पैदा करना और लड़कियों के लिए कल्याण सेवाओं की दक्षता में सुधार करना है। यह योजना घटते बाल लिंग अनुपात और महिला सशक्तिकरण से संबंधित मुद्दों को संबोधित करती है।"
+    },
+    "category": "women",
+    "authority": "central",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "gender": "female",
+      "age_min": 0,
+      "age_max": 21
+    },
+    "benefits": "Financial incentives through Sukanya Samriddhi Account. Free education in government schools. Scholarships for higher education. Skill development training. Protection from gender discrimination. Awareness campaigns on importance of girl child education and health.",
+    "benefits_translations": {
+      "hi": "सुकन्या समृद्धि खाते के माध्यम से वित्तीय प्रोत्साहन। सरकारी स्कूलों में मुफ्त शिक्षा। उच्च शिक्षा के लिए छात्रवृत्ति। कौशल विकास प्रशिक्षण। लिंग भेदभाव से सुरक्षा।"
+    },
+    "application_process": "1. Open Sukanya Samriddhi Account at post office or authorized bank\n2. Minimum deposit of ₹250 to open account\n3. Account can be opened for girl child up to age of 10 years\n4. Deposit minimum ₹250 and maximum ₹1.5 lakh per year\n5. Account matures after 21 years from date of opening\n6. Partial withdrawal allowed after girl turns 18 for education\n7. Tax benefits under Section 80C of Income Tax Act\n8. Interest rate: 8.2% per annum (subject to change)",
+    "application_process_translations": {
+      "hi": "1. डाकघर या अधिकृत बैंक में सुकन्या समृद्धि खाता खोलें\n2. खाता खोलने के लिए न्यूनतम ₹250 जमा करें\n3. 10 वर्ष की आयु तक की बालिका के लिए खाता खोला जा सकता है"
+    },
+    "official_url": "https://wcd.nic.in/bbbp-schemes",
+    "helpline_numbers": ["011-23388612", "011-23388613"],
+    "status": "active",
+    "start_date": "2015-01-22T00:00:00",
+    "end_date": null
+  }
+]

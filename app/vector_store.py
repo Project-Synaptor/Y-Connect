@@ -198,12 +198,22 @@ class VectorStoreClient:
         
         try:
             # Convert VectorDocument objects to PointStruct
+            # Generate UUID for each document ID to comply with Qdrant requirements
+            import uuid
+            import hashlib
+            
             points = []
             for doc in documents:
+                # Generate deterministic UUID from document ID
+                # This ensures same doc ID always gets same UUID
+                doc_id_hash = hashlib.md5(doc.id.encode()).hexdigest()
+                doc_uuid = str(uuid.UUID(doc_id_hash))
+                
                 point = PointStruct(
-                    id=doc.id,
+                    id=doc_uuid,
                     vector=doc.vector,
                     payload={
+                        "document_id": doc.id,  # Store original ID in payload
                         "text_chunk": doc.text_chunk,
                         **doc.metadata
                     }

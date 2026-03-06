@@ -80,6 +80,34 @@ class SchemeRepository:
         except psycopg2.Error as e:
             logger.error(f"Error retrieving scheme {scheme_id}: {e}")
             raise
+    def get_all_schemes(self) -> List[Scheme]:
+        """
+        Get all schemes from database
+
+        Returns:
+            List of all Scheme objects
+        """
+        query = """
+        SELECT * FROM schemes
+        ORDER BY last_updated DESC;
+        """
+
+        try:
+            with db_pool.get_cursor() as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+
+                schemes = []
+                for row in rows:
+                    scheme = self._row_to_scheme(row)
+                    if scheme:
+                        schemes.append(scheme)
+
+                return schemes
+
+        except Exception as e:
+            logger.error(f"Error fetching all schemes: {e}")
+            return []
     
     @staticmethod
     def search_schemes(

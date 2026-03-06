@@ -328,6 +328,7 @@ Status: {scheme.status.value}
                     'content': chunk,
                     'document_type': 'overview',
                     'metadata': {
+                        'scheme_id': scheme.scheme_id,  # Add scheme_id to metadata
                         'scheme_name': scheme_name,
                         'scheme_name_local': scheme_name,
                         'category': scheme.category.value,

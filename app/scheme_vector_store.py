@@ -212,35 +212,31 @@ class SchemeVectorStore:
             )
             
             # Convert results to SchemeDocument objects
-            # Note: This is a simplified version - in production, you'd fetch
-            # full scheme details from the database
+            # Fetch full scheme details from database
             scheme_documents = []
+            
+            # Import here to avoid circular dependency
+            from app.scheme_repository import SchemeRepository
+            scheme_repo = SchemeRepository()
             
             for result in results:
                 metadata = result["metadata"]
+                scheme_id = metadata["scheme_id"]
                 
-                # Create a minimal Scheme object from metadata
-                # In production, fetch full scheme from database
-                scheme = Scheme(
-                    scheme_id=metadata["scheme_id"],
-                    scheme_name=metadata["scheme_name"],
-                    description=result["text_chunk"],
-                    category=metadata["category"],
-                    authority=metadata["authority"],
-                    applicable_states=metadata.get("applicable_states", ["ALL"]),
-                    benefits="",  # Would be fetched from database
-                    application_process="",  # Would be fetched from database
-                    official_url="",  # Would be fetched from database
-                    status=metadata["status"],
-                )
+                # Fetch full scheme from database
+                scheme = scheme_repo.get_scheme_by_id(scheme_id)
+                
+                if not scheme:
+                    logger.warning(f"Scheme {scheme_id} not found in database, skipping")
+                    continue
                 
                 scheme_doc = SchemeDocument(
-                    document_id=result["id"],
-                    scheme_id=metadata["scheme_id"],
+                    document_id=result.get("id", metadata.get("document_id", "")),
+                    scheme_id=scheme_id,
                     scheme=scheme,
                     language=metadata["language"],
                     content=result["text_chunk"],
-                    document_type=metadata["document_type"],
+                    document_type=metadata.get("document_type", "overview"),
                     similarity_score=result["score"]
                 )
                 

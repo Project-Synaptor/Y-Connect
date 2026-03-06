@@ -1,0 +1,40 @@
+[
+  {
+    "scheme_id": "SCHEME-ID-HERE",
+    "scheme_name": "Full Scheme Name",
+    "scheme_name_translations": {
+      "hi": "योजना का नाम हिंदी में",
+      "ta": "தமிழில் திட்டத்தின் பெயர்",
+      "te": "తెలుగులో పథకం పేరు",
+      "bn": "বাংলায় প্রকল্পের নাম",
+      "mr": "मराठीत योजनेचे नाव"
+    },
+    "description": "Detailed description of the scheme in English. What it does, who it helps, and its main objectives.",
+    "description_translations": {
+      "hi": "योजना का विस्तृत विवरण हिंदी में"
+    },
+    "category": "agriculture|education|health|housing|women|senior_citizens|employment|financial_inclusion|social_welfare|skill_development",
+    "authority": "central|state",
+    "applicable_states": ["ALL"],
+    "eligibility_criteria": {
+      "age_min": 18,
+      "age_max": 60,
+      "occupation": "farmer|student|any",
+      "income_max": 500000,
+      "gender": "male|female|any"
+    },
+    "benefits": "Detailed benefits description. What the beneficiary receives.",
+    "benefits_translations": {
+      "hi": "लाभ का विवरण हिंदी में"
+    },
+    "application_process": "Step-by-step application process:\n1. First step\n2. Second step\n3. Third step",
+    "application_process_translations": {
+      "hi": "आवेदन प्रक्रिया हिंदी में"
+    },
+    "official_url": "https://www.myscheme.gov.in/schemes/scheme-name",
+    "helpline_numbers": ["1800-XXX-XXXX"],
+    "status": "active",
+    "start_date": "2020-01-01T00:00:00",
+    "end_date": null
+  }
+]
