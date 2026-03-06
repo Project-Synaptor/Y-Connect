@@ -82,30 +82,25 @@ class YConnectPipeline:
                 language=language
             )
             
-            # 6. Update session with new message
+            # 6. Update session with new message and response
             from app.models import Message, MessageRole
-            self.session_manager.add_message_to_session(
-                session_id=session.session_id,
-                message=Message(
-                    role=MessageRole.USER,
-                    content=user_message,
-                    language=language
-                )
+            
+            user_message_obj = Message(
+                role=MessageRole.USER,
+                content=user_message,
+                language=language
             )
             
-            self.session_manager.add_message_to_session(
+            self.session_manager.update_session(
                 session_id=session.session_id,
-                message=Message(
-                    role=MessageRole.ASSISTANT,
-                    content=generated_response.text,
-                    language=language
-                )
+                message=user_message_obj,
+                response=generated_response.text
             )
             
             # 7. Update user context with extracted entities
             if processed_query.entities:
                 self.session_manager.update_session_context(
-                    session_id=session.session_id,
+                    phone_number=phone_number,
                     context_updates=processed_query.entities
                 )
             
