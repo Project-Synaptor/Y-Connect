@@ -299,8 +299,9 @@ class RAGEngine:
                 # Will match schemes with this state OR 'ALL'
                 filters["state"] = location
         
-        # Filter by status (prefer active schemes)
-        filters["status"] = SchemeStatus.ACTIVE.value
+        # NOTE: Status filter commented out until Qdrant collection has indexes
+        # Uncomment after running: python scripts/recreate_qdrant_collection.py
+        # filters["status"] = SchemeStatus.ACTIVE.value
         
         return filters
     
