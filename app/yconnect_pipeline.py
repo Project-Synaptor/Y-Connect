@@ -60,8 +60,7 @@ class YConnectPipeline:
             
             # 2. Get or create user session
             session = self.session_manager.get_or_create_session(
-                phone_number=phone_number,
-                language=language
+                phone_number=phone_number
             )
             
             # 3. Process query (extract intent and entities)
