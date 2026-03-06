@@ -111,8 +111,8 @@ class VectorStoreClient:
         
         # Initialize Qdrant client with credentials
         self.client = QdrantClient(
-            url=self.url,
-            api_key=self.api_key
+            url="https://85607eaf-f950-4768-9509-dba27ce4384b.us-east-1-1.aws.cloud.qdrant.io",
+            api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.4Ec8gmNMiTSXLCDu6Leb-kI1AAuvo4eYoWcgD6lbEbI"
         )
         
         logger.info(
