@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, Response, JSONResponse
 from twilio.twiml.messaging_response import MessagingResponse
+from app.yconnect_pipeline import process_whatsapp_message
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -329,27 +330,19 @@ def ask_yconnect_brain(user_message: str) -> str:
 
 @app.post("/twilio")
 async def twilio_webhook(request: Request):
-    logger = get_logger(__name__)
-    try:
-        form_data = await request.form()
-        incoming_msg = form_data.get('Body', '')
-        sender_number = form_data.get('From', '')
-        
-        logger.info(f"Twilio Sandbox received: '{incoming_msg}' from {sender_number}")
+    form_data = await request.form()
+    incoming_msg = form_data.get('Body', '')
+    sender_id = form_data.get('From', '') # Grabbing the phone number for session tracking!
 
-        # --- THE BRAIN IS NOW ACTIVE ---
-        # We pass the WhatsApp message to Claude 3 Haiku
-        ai_reply = ask_yconnect_brain(incoming_msg)
+    # The pipeline handles Qdrant, Redis, translation, and AWS Bedrock automatically
+    final_bot_response = handle_whatsapp_query(incoming_msg, session_id=sender_id)
 
-        twiml_response = MessagingResponse()
-        reply = twiml_response.message()
-        reply.body(ai_reply)
+    # 3. Send the AI's final answer back to WhatsApp
+    twiml_response = MessagingResponse()
+    reply = twiml_response.message()
+    reply.body(final_bot_response)
 
-        return Response(content=str(twiml_response), media_type="application/xml")
-        
-    except Exception as e:
-        logger.error(f"Twilio webhook error: {e}")
-        raise HTTPException(status_code=500, detail="Twilio processing failed")
+    return Response(content=str(twiml_response), media_type="application/xml")
 
 
 if __name__ == "__main__":

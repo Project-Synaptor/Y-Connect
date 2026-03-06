@@ -7,8 +7,14 @@ Retrieves relevant schemes using semantic search and generates responses using L
 import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-import httpx
 import time
+import os
+
+try:
+    import boto3
+    BOTO3_AVAILABLE = True
+except ImportError:
+    BOTO3_AVAILABLE = False
 
 from app.models import ProcessedQuery, SchemeDocument, Scheme, SchemeStatus
 from app.scheme_vector_store import SchemeVectorStore
@@ -81,8 +87,22 @@ class RAGEngine:
         else:
             self.scheme_repository = scheme_repository
         
-        # HTTP client for LLM API calls
-        self.http_client = httpx.AsyncClient(timeout=30.0)
+        # Initialize AWS Bedrock client for LLM
+        if BOTO3_AVAILABLE:
+            try:
+                self.bedrock_client = boto3.client(
+                    service_name='bedrock-runtime',
+                    region_name=os.getenv('AWS_REGION', 'us-east-1'),
+                    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                )
+                logger.info("Initialized AWS Bedrock client for Nova Lite")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Bedrock client: {e}")
+                self.bedrock_client = None
+        else:
+            logger.warning("boto3 not available, Bedrock client not initialized")
+            self.bedrock_client = None
         
         logger.info("Initialized RAGEngine")
     
@@ -533,102 +553,71 @@ Response:"""
     
     async def _call_llm_api(self, prompt: str, language: str) -> str:
         """
-        Call LLM API to generate response
+        Call LLM API to generate response using AWS Bedrock Nova Lite
         
         Args:
-            prompt: Formatted prompt
+            prompt: Formatted prompt with context
             language: Target language
             
         Returns:
             Generated response text
         """
         start_time = time.time()
-        provider = self.settings.llm_provider
         
         try:
-            if provider == "openai":
-                result = await self._call_openai_api(prompt)
-                duration = time.time() - start_time
-                
-                # Track successful LLM call
-                # Note: Token counting would require parsing the response
-                # For now, we track the call without token details
-                metrics_tracker.track_llm_call(
-                    provider=provider,
-                    status="success",
-                    duration=duration
-                )
-                
-                return result
-            else:
-                raise ValueError(f"Unsupported LLM provider: {provider}")
+            if not self.bedrock_client:
+                raise RuntimeError("Bedrock client not initialized")
+            
+            # Extract system message and user message from prompt
+            # The prompt already contains context, so we use it directly
+            system_message = "You are Y-Connect, a helpful, friendly AI assistant for rural India that provides information about government schemes."
+            
+            # Call AWS Bedrock Nova Lite using converse API
+            model_id = 'us.amazon.nova-lite-v1:0'
+            
+            response = self.bedrock_client.converse(
+                modelId=model_id,
+                system=[{"text": system_message}],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [{"text": prompt}]
+                    }
+                ],
+                inferenceConfig={
+                    "maxTokens": 1000,
+                    "temperature": 0.5
+                }
+            )
+            
+            # Extract response text
+            result = response['output']['message']['content'][0]['text']
+            
+            duration = time.time() - start_time
+            
+            # Track successful LLM call
+            metrics_tracker.track_llm_call(
+                provider="aws_bedrock_nova",
+                status="success",
+                duration=duration
+            )
+            
+            logger.info(f"Generated response using AWS Bedrock Nova Lite in {duration:.2f}s")
+            
+            return result.strip()
         
-        except httpx.TimeoutException:
-            duration = time.time() - start_time
-            metrics_tracker.track_llm_call(
-                provider=provider,
-                status="timeout",
-                duration=duration
-            )
-            logger.error("LLM API timeout")
-            raise
-        except httpx.HTTPError as e:
-            duration = time.time() - start_time
-            metrics_tracker.track_llm_call(
-                provider=provider,
-                status="http_error",
-                duration=duration
-            )
-            logger.error(f"LLM API HTTP error: {e}")
-            raise
         except Exception as e:
             duration = time.time() - start_time
             metrics_tracker.track_llm_call(
-                provider=provider,
+                provider="aws_bedrock_nova",
                 status="error",
                 duration=duration
             )
-            logger.error(f"LLM API error: {e}")
-            raise
-    
-    async def _call_openai_api(self, prompt: str) -> str:
-        """
-        Call OpenAI API
-        
-        Args:
-            prompt: Formatted prompt
+            logger.error(f"AWS Bedrock API error: {e}")
             
-        Returns:
-            Generated response text
-        """
-        url = f"{self.settings.llm_api_url}/chat/completions"
-        
-        headers = {
-            "Authorization": f"Bearer {self.settings.llm_api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": self.settings.llm_model,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are Y-Connect, a helpful assistant for Indian government schemes."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            "temperature": 0.7,
-            "max_tokens": 1000
-        }
-        
-        response = await self.http_client.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-        
-        data = response.json()
-        return data["choices"][0]["message"]["content"].strip()
+            # Fallback to a generic error message
+            raise RuntimeError(f"Failed to generate response: {e}")
+    
     
     def _get_no_results_message(self, language: str) -> str:
         """Get 'no results found' message in target language"""
@@ -665,7 +654,6 @@ Response:"""
         return messages.get(language, messages["en"])
     
     async def close(self) -> None:
-        """Close HTTP client and cleanup resources"""
-        await self.http_client.aclose()
+        """Close resources and cleanup"""
         self.vector_store.close()
         logger.info("Closed RAGEngine resources")
