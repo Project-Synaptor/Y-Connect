@@ -1,5 +1,5 @@
 # Y-Connect WhatsApp Bot - Production Dockerfile
-# Multi-stage build for optimized image size
+# Multi-stage build for optimized image size with CPU-only PyTorch
 
 # Stage 1: Builder
 FROM python:3.11-slim as builder
@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements file
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install Python dependencies with CPU-only PyTorch
+# The --extra-index-url in requirements.txt will pull CPU-only versions
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Stage 2: Runtime
