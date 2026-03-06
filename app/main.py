@@ -332,7 +332,7 @@ def ask_yconnect_brain(user_message: str) -> str:
 async def twilio_webhook(request: Request):
     form_data = await request.form()
     incoming_msg = form_data.get('Body', '')
-    sender_id = form_data.get('From', '') # Grabbing the phone number for session tracking!
+    sender_id = form_data.get('From', '').replace('whatsapp:', '') # Grabbing the phone number for session tracking!
 
     # The pipeline handles Qdrant, Redis, translation, and AWS Bedrock automatically
     final_bot_response = await process_whatsapp_message(incoming_msg, phone_number=sender_id)
