@@ -65,7 +65,6 @@ class YConnectPipeline:
             
             # 3. Process query (extract intent and entities)
             processed_query = self.query_processor.process_query(
-                language=language,
                 session_context=session.user_context
             )
             
