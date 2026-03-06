@@ -89,28 +89,29 @@ class HealthChecker:
         
         try:
             # Import here to avoid circular dependencies
-            from app.database import get_db_connection
+            from app.database import db_pool
             
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            # Simple query to check connectivity
-            cursor.execute("SELECT 1")
-            result = cursor.fetchone()
-            
-            cursor.close()
-            conn.close()
-            
-            response_time = (datetime.utcnow() - start_time).total_seconds() * 1000
-            
-            if result and result[0] == 1:
-                return HealthCheckResult(
-                    component="postgres",
-                    status=HealthStatus.HEALTHY,
-                    message="PostgreSQL is healthy",
-                    response_time_ms=response_time
-                )
-            else:
+            # Use the connection pool's context manager
+            with db_pool.get_cursor(commit=False) as cursor:
+                # Simple query to check connectivity
+                cursor.execute("SELECT 1 as health_check")
+                result = cursor.fetchone()
+                
+                response_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+                
+                # RealDictCursor returns dict, regular cursor returns tuple
+                if result:
+                    # Check if it's a dict or tuple
+                    check_value = result.get('health_check', None) if isinstance(result, dict) else result[0]
+                    
+                    if check_value == 1:
+                        return HealthCheckResult(
+                            component="postgres",
+                            status=HealthStatus.HEALTHY,
+                            message="PostgreSQL is healthy",
+                            response_time_ms=response_time
+                        )
+                
                 return HealthCheckResult(
                     component="postgres",
                     status=HealthStatus.UNHEALTHY,
@@ -196,9 +197,9 @@ class HealthChecker:
         
         try:
             # Import here to avoid circular dependencies
-            from app.vector_store import VectorStore
+            from app.vector_store import VectorStoreClient
             
-            vector_store = VectorStore()
+            vector_store = VectorStoreClient()
             
             # Check if client is initialized
             if vector_store.client is None:
@@ -211,7 +212,7 @@ class HealthChecker:
             # Try to get collection info
             try:
                 collection_info = vector_store.client.get_collection(
-                    collection_name=self.settings.qdrant_collection_name
+                    collection_name=vector_store.collection_name
                 )
                 
                 response_time = (datetime.utcnow() - start_time).total_seconds() * 1000
@@ -221,7 +222,7 @@ class HealthChecker:
                     status=HealthStatus.HEALTHY,
                     message="Vector store is healthy",
                     details={
-                        "collection": self.settings.qdrant_collection_name,
+                        "collection": vector_store.collection_name,
                         "vectors_count": collection_info.vectors_count if hasattr(collection_info, 'vectors_count') else "unknown"
                     },
                     response_time_ms=response_time
@@ -233,7 +234,7 @@ class HealthChecker:
                     return HealthCheckResult(
                         component="vector_store",
                         status=HealthStatus.DEGRADED,
-                        message=f"Vector store connected but collection not found: {self.settings.qdrant_collection_name}"
+                        message=f"Vector store connected but collection not found: {vector_store.collection_name}"
                     )
                 else:
                     raise
