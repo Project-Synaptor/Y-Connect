@@ -300,36 +300,31 @@ bedrock_client = boto3.client(
 )
 
 def ask_yconnect_brain(user_message: str) -> str:
-    """Sends the user's message to Claude 3 Haiku on AWS Bedrock."""
-    model_id = 'us.anthropic.claude-3-haiku-20240307-v1:0'
+    """Sends the user's message to Amazon Nova Lite on AWS Bedrock."""
+    # Using the Amazon native model to bypass Marketplace requirements
+    model_id = 'us.amazon.nova-lite-v1:0'
     
-    # Format required by Claude 3 Messages API
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 512,
-        "temperature": 0.5,
-        "system": "You are Y-Connect, a helpful, friendly AI assistant for rural India. Keep answers concise, clear, and easy to read on a mobile phone. If asked about government schemes, be precise.",
-        "messages": [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": user_message}]
-            }
-        ]
-    })
-
     try:
-        response = bedrock_client.invoke_model(
+        # The 'converse' API is the modern, native way to talk to Amazon Nova
+        response = bedrock_client.converse(
             modelId=model_id,
-            body=body,
-            accept='application/json',
-            contentType='application/json'
+            system=[{"text": "You are Y-Connect, a helpful, friendly AI assistant for rural India. Keep answers concise, clear, and easy to read on a mobile phone. If asked about government schemes, be precise."}],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [{"text": user_message}]
+                }
+            ],
+            inferenceConfig={
+                "maxTokens": 512,
+                "temperature": 0.5
+            }
         )
-        response_body = json.loads(response.get('body').read())
-        return response_body['content'][0]['text']
+        # Extract the text from the response
+        return response['output']['message']['content'][0]['text']
     except Exception as e:
         print(f"Bedrock Error: {e}")
         return "I'm sorry, I am having trouble connecting to the government database right now. Please try again in a moment."
-
 # --- TWILIO SANDBOX TESTING ENDPOINT ---
 
 @app.post("/twilio")
