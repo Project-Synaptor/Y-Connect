@@ -335,7 +335,7 @@ async def twilio_webhook(request: Request):
     sender_id = form_data.get('From', '') # Grabbing the phone number for session tracking!
 
     # The pipeline handles Qdrant, Redis, translation, and AWS Bedrock automatically
-    final_bot_response = handle_whatsapp_query(incoming_msg, session_id=sender_id)
+    final_bot_response = await process_whatsapp_message(incoming_msg, phone_number=sender_id)
 
     # 3. Send the AI's final answer back to WhatsApp
     twiml_response = MessagingResponse()
