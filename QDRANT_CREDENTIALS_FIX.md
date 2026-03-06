@@ -1,54 +1,94 @@
 # Qdrant 401 Unauthorized Fix
 
 ## Problem
-Qdrant container was throwing `401 Unauthorized` errors because the client wasn't passing connection credentials properly.
+Qdrant container was throwing `401 Unauthorized` errors because the Python client wasn't automatically picking up the `.env` credentials inside the container.
+
+## Root Cause
+Environment variables from `.env` weren't being loaded before the QdrantClient initialization, causing the client to connect without credentials.
+
+## Solution
+Force-load the `.env` file using `python-dotenv` before initializing the QdrantClient.
 
 ## What Was Fixed
 
-### 1. Updated `app/vector_store.py`
-- Added `import os` to read environment variables
-- Updated `VectorStoreClient.__init__()` to properly read credentials:
-  ```python
-  # Get URL from parameter, env var, or config (in that order)
-  self.url = url or os.getenv("QDRANT_URL") or settings.vector_db_url
-  
-  # Get API key from parameter or env var (in that order)
-  self.api_key = api_key or os.getenv("QDRANT_API_KEY")
-  
-  # Initialize Qdrant client with credentials
-  self.client = QdrantClient(
-      url=self.url,
-      api_key=self.api_key
-  )
-  ```
+### Updated `app/vector_store.py`
 
-### 2. Updated `.env`
-Added explicit Qdrant credentials:
+**Added imports:**
+```python
+import os
+from dotenv import load_dotenv
+```
+
+**Updated `VectorStoreClient.__init__()` to force-load .env:**
+```python
+# Force load the .env file from the project root
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+load_dotenv(env_path)
+
+# Get URL from parameter, env var, or config (in that order)
+self.url = url or os.getenv("QDRANT_URL") or settings.vector_db_url
+
+# Get API key from parameter or env var (in that order)
+self.api_key = api_key or os.getenv("QDRANT_API_KEY")
+
+# Initialize Qdrant client with credentials
+self.client = QdrantClient(
+    url=self.url,
+    api_key=self.api_key
+)
+```
+
+## Why This Works
+
+1. **Explicit .env Loading**: `load_dotenv()` explicitly loads environment variables from the `.env` file
+2. **Correct Path Resolution**: Uses `os.path.dirname(__file__)` to find the project root
+3. **Priority Order**: Checks parameter → env var → config settings
+4. **Works in Docker**: The .env file is copied into the Docker container and loaded at runtime
+
+## Verify the Fix
+
+### 1. Check .env File Exists
 ```bash
-# Qdrant Vector Database
+# Make sure .env is in the project root
+ls -la .env
+
+# Check it has Qdrant credentials
+cat .env | grep QDRANT
+```
+
+Expected output:
+```
 QDRANT_URL=http://localhost:6333
 QDRANT_API_KEY=
 ```
 
-### 3. Updated `.env.example`
-Added Qdrant credentials with helpful comments:
+### 2. Test Connection
+```python
+from app.vector_store import VectorStoreClient
+
+# This will now load .env automatically
+client = VectorStoreClient()
+print(f"✓ Connected to Qdrant at {client.url}")
+print(f"✓ API Key: {'configured' if client.api_key else 'not required'}")
+```
+
+### 3. Restart Docker Services
 ```bash
-# Qdrant Vector Database
-# For local Docker: http://qdrant:6333 (in docker-compose) or http://localhost:6333 (local dev)
-# For Qdrant Cloud: https://your-cluster.qdrant.io
-QDRANT_URL=http://localhost:6333
-QDRANT_API_KEY=
+# Rebuild and restart
+docker-compose down
+docker-compose build --no-cache app
+docker-compose up -d
+
+# Check logs
+docker logs y-connect-app | grep -i qdrant
 ```
 
-### 4. Updated `docker-compose.yml`
-Added Qdrant environment variables to the app service:
-```yaml
-# Qdrant (explicit credentials)
-- QDRANT_URL=http://qdrant:6333
-- QDRANT_API_KEY=${QDRANT_API_KEY:-}
+You should see:
+```
+Initialized VectorStoreClient with collection: y-connect-schemes, URL: http://qdrant:6333, API key: None
 ```
 
-## Configuration Options
+## Configuration
 
 ### Local Development (No Authentication)
 ```bash

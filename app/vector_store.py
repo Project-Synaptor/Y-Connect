@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 import logging
 import os
+from dotenv import load_dotenv
 
 try:
     from qdrant_client import QdrantClient
@@ -92,6 +93,10 @@ class VectorStoreClient:
                 "qdrant-client is not installed. "
                 "Install it with: pip install qdrant-client"
             )
+        
+        # Force load the .env file from the project root
+        env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+        load_dotenv(env_path)
         
         settings = get_settings()
         
