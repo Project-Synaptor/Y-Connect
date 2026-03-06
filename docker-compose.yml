@@ -35,6 +35,10 @@ services:
       - VECTOR_DB_INDEX_NAME=${VECTOR_DB_INDEX_NAME:-y-connect-schemes}
       - VECTOR_EMBEDDING_DIMENSION=${VECTOR_EMBEDDING_DIMENSION:-384}
       
+      # Qdrant (explicit credentials)
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY:-}
+      
       # PostgreSQL
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432

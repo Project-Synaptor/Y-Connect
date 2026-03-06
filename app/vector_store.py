@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 import logging
+import os
 
 try:
     from qdrant_client import QdrantClient
@@ -81,8 +82,8 @@ class VectorStoreClient:
         Initialize Qdrant vector store client
         
         Args:
-            url: Qdrant server URL (defaults to config)
-            api_key: Qdrant API key (defaults to config)
+            url: Qdrant server URL (defaults to QDRANT_URL env var or config)
+            api_key: Qdrant API key (defaults to QDRANT_API_KEY env var)
             collection_name: Collection name (defaults to config)
             vector_size: Dimension of embedding vectors (default: 384)
         """
@@ -94,20 +95,25 @@ class VectorStoreClient:
         
         settings = get_settings()
         
-        self.url = url or settings.vector_db_api_key  # Using api_key field for URL
-        self.api_key = api_key
+        # Get URL from parameter, env var, or config (in that order)
+        self.url = url or os.getenv("QDRANT_URL") or settings.vector_db_url
+        
+        # Get API key from parameter or env var (in that order)
+        self.api_key = api_key or os.getenv("QDRANT_API_KEY")
+        
         self.collection_name = collection_name or settings.vector_db_index_name
         self.vector_size = vector_size
         
-        # Initialize Qdrant client
-        if self.api_key:
-            self.client = QdrantClient(url=self.url, api_key=self.api_key)
-        else:
-            # For local development without API key
-            self.client = QdrantClient(url=self.url)
+        # Initialize Qdrant client with credentials
+        self.client = QdrantClient(
+            url=self.url,
+            api_key=self.api_key
+        )
         
         logger.info(
-            f"Initialized VectorStoreClient with collection: {self.collection_name}"
+            f"Initialized VectorStoreClient with collection: {self.collection_name}, "
+            f"URL: {self.url}, "
+            f"API key: {'***' if self.api_key else 'None'}"
         )
     
     def create_collection(self, vector_size: Optional[int] = None) -> None:
