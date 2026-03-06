@@ -65,7 +65,8 @@ class YConnectPipeline:
             
             # 3. Process query (extract intent and entities)
             processed_query = self.query_processor.process_query(
-               user_message
+                 user_message,
+                 session
 )
             
             # 4. Retrieve relevant schemes using RAG
