@@ -123,7 +123,7 @@ class VectorStoreClient:
     
     def create_collection(self, vector_size: Optional[int] = None) -> None:
         """
-        Create a new collection in Qdrant
+        Create a new collection in Qdrant with proper indexes
         
         Args:
             vector_size: Dimension of vectors (defaults to instance vector_size)
@@ -139,6 +139,9 @@ class VectorStoreClient:
                 logger.info(f"Collection {self.collection_name} already exists")
                 return
             
+            # Import PayloadSchemaType for creating indexes
+            from qdrant_client.models import PayloadSchemaType
+            
             # Create collection with cosine distance metric
             self.client.create_collection(
                 collection_name=self.collection_name,
@@ -147,8 +150,33 @@ class VectorStoreClient:
                     distance=Distance.COSINE
                 ),
             )
+            
+            # Create indexes for filterable fields
+            # This allows efficient filtering without scanning all documents
+            filterable_fields = [
+                "scheme_id",
+                "category",
+                "authority",
+                "state",
+                "status",
+                "language",
+                "document_type",
+            ]
+            
+            for field in filterable_fields:
+                try:
+                    self.client.create_payload_index(
+                        collection_name=self.collection_name,
+                        field_name=field,
+                        field_schema=PayloadSchemaType.KEYWORD
+                    )
+                    logger.info(f"Created index for field: {field}")
+                except Exception as e:
+                    logger.warning(f"Could not create index for {field}: {e}")
+            
             logger.info(
-                f"Created collection {self.collection_name} with vector size {size}"
+                f"Created collection {self.collection_name} with vector size {size} "
+                f"and {len(filterable_fields)} indexes"
             )
         except Exception as e:
             logger.error(f"Error creating collection: {e}")
