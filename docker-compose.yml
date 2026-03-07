@@ -27,7 +27,12 @@ services:
       - LLM_API_KEY=${LLM_API_KEY}
       - LLM_MODEL=${LLM_MODEL:-gpt-4}
       - LLM_API_URL=${LLM_API_URL}
-      
+
+      # AWS
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+
       # Vector Database
       - VECTOR_DB_PROVIDER=${VECTOR_DB_PROVIDER:-qdrant}
       - VECTOR_DB_URL=http://qdrant:6333
@@ -52,7 +57,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=${REDIS_DB:-0}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_SESSION_TTL=${REDIS_SESSION_TTL:-86400}
       
       # Session Management

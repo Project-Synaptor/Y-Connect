@@ -1,197 +1,94 @@
-# Y-Connect WhatsApp Bot
+# 🇮🇳 Y-Connect: The Voice-First Government "Buddy"
 
-A WhatsApp-based conversational AI system that helps Indian citizens discover government schemes using natural language queries in their preferred language.
-
-## 🌟 Features
-
-- **Multi-Language Support**: Communicate in 10 Indian languages (Hindi, English, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi)
-- **RAG-Based Retrieval**: Accurate scheme information using Retrieval-Augmented Generation
-- **Natural Language Processing**: Understand queries in conversational language
-- **Context-Aware**: Maintains conversation history and user context
-- **Real-Time Responses**: Fast responses via WhatsApp Business API
-- **Privacy-First**: Automatic session expiry and PII anonymization
-- **Scalable Architecture**: Docker-based deployment with monitoring
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Docker and Docker Compose
-- WhatsApp Business API credentials
-- LLM API key (OpenAI, Anthropic, etc.)
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/your-org/y-connect-whatsapp-bot.git
-cd y-connect-whatsapp-bot
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Start services
-docker-compose up -d
-
-# Import government schemes
-docker exec -it y-connect-app python scripts/import_schemes.py
-
-# Check health
-curl http://localhost:8000/health
-```
-
-See [Quick Start Guide](docs/QUICK_START.md) for detailed instructions.
-
-## 📚 Documentation
-
-- [Deployment Guide](docs/DEPLOYMENT.md) - Complete deployment instructions
-- [Quick Start Guide](docs/QUICK_START.md) - Get started in 10 minutes
-- [Environment Variables](docs/ENVIRONMENT_VARIABLES.md) - Configuration reference
-- [Deployment Checklist](docs/DEPLOYMENT_CHECKLIST.md) - Pre-launch checklist
-
-## 🏗️ Architecture
-
-```
-┌─────────────┐
-│   WhatsApp  │
-│    Users    │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────────────────────────┐
-│     WhatsApp Business API (Webhook)     │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌──────────────────────────────────────────┐
-│         Y-Connect Application            │
-│  ┌────────────────────────────────────┐  │
-│  │  Language Detector                 │  │
-│  │  Query Processor                   │  │
-│  │  RAG Engine                        │  │
-│  │  Response Generator                │  │
-│  └────────────────────────────────────┘  │
-└───┬──────────┬──────────┬────────────────┘
-    │          │          │
-    ▼          ▼          ▼
-┌─────────┐ ┌──────┐ ┌─────────┐
-│PostgreSQL│ │Redis │ │ Qdrant  │
-│         │ │      │ │ Vector  │
-│ Schemes │ │Session│ │  Store  │
-└─────────┘ └──────┘ └─────────┘
-```
-
-## 🛠️ Technology Stack
-
-- **Backend**: Python 3.11, FastAPI
-- **Database**: PostgreSQL 14
-- **Cache**: Redis 7
-- **Vector Store**: Qdrant
-- **Embeddings**: sentence-transformers
-- **LLM**: OpenAI GPT-4 / Anthropic Claude / Custom
-- **Testing**: pytest, Hypothesis (property-based testing)
-- **Monitoring**: Prometheus, Grafana
-- **Deployment**: Docker, Docker Compose
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=app --cov-report=html
-
-# Run property-based tests
-pytest -m property
-
-# Run specific test file
-pytest tests/test_language_detector.py
-```
-
-## 📊 Monitoring
-
-Access monitoring dashboards:
-
-```bash
-# Start with monitoring
-docker-compose --profile monitoring up -d
-
-# Grafana: http://localhost:3000 (admin/admin)
-# Prometheus: http://localhost:9090
-# Metrics: http://localhost:8000/metrics
-```
-
-## 🔒 Security
-
-- HTTPS enforcement in production
-- Webhook signature verification
-- PII anonymization in logs
-- Session data auto-expiry (24 hours)
-- Secure environment variable management
-- Rate limiting and DDoS protection
-
-## 🌍 Supported Languages
-
-| Language   | Code | Native Name |
-|------------|------|-------------|
-| Hindi      | hi   | हिन्दी      |
-| English    | en   | English     |
-| Tamil      | ta   | தமிழ்       |
-| Telugu     | te   | తెలుగు      |
-| Bengali    | bn   | বাংলা       |
-| Marathi    | mr   | मराठी       |
-| Gujarati   | gu   | ગુજરાતી     |
-| Kannada    | kn   | ಕನ್ನಡ       |
-| Malayalam  | ml   | മലയാളം      |
-| Punjabi    | pa   | ਪੰਜਾਬੀ      |
-
-## 📈 Performance
-
-- Response time: <10 seconds (95th percentile)
-- Concurrent users: 100+
-- Language detection: >90% accuracy
-- RAG retrieval: <2 seconds
-- Session management: 24-hour TTL
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our Contributing Guide for details.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- WhatsApp Business API for messaging platform
-- OpenAI/Anthropic for LLM capabilities
-- Qdrant for vector search
-- Indian government for scheme data
-
-## 📞 Support
-
-- **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-org/y-connect-whatsapp-bot/issues)
-- **Email**: support@y-connect.example.com
-
-## 🗺️ Roadmap
-
-- [ ] Voice message support
-- [ ] Image-based scheme discovery
-- [ ] Multi-turn clarification dialogs
-- [ ] Personalized scheme recommendations
-- [ ] Integration with government portals
-- [ ] Mobile app companion
-- [ ] Analytics dashboard
+**Team Name:** GitHappens  
+**Team Leader:** Tushar Singh  
+**Hackathon:** AI for Bharat Hackathon (Powered by AWS)  
+**Track:** AI for Communities, Access & Public Impact  
 
 ---
 
-Made with ❤️ for Indian citizens
+## 🎯 The Problem: Bridging the "Last Mile"
+
+Currently, rural citizens face massive hurdles when trying to access government schemes. Government websites are complex, require English literacy, and often demand 4G internet and PDF downloads. This creates a severe "Digital Divide" where the people who need financial assistance the most are the least equipped to navigate the portals.
+
+## 🚀 The Solution: Y-Connect
+
+Y-Connect is an AI-powered WhatsApp agent that helps rural users find and apply for government schemes using natural language. Unlike complex web portals, Y-Connect operates entirely within WhatsApp. It requires zero new app installs, works perfectly on low-end smartphones over basic 2G/3G networks, and eliminates the literacy barrier by interacting with users exactly where they are already comfortable.
+
+---
+
+## 🏗️ Current MVP Architecture (Live & Deployed)
+
+For the hackathon submission, we focused on building a bulletproof, highly scalable cloud backend capable of processing concurrent WhatsApp messages with extremely low latency.
+
+* **The Gateway:** Twilio WhatsApp Business API webhook integration.
+* **The Orchestrator:** Asynchronous Python FastAPI server.
+* **The Memory:** Redis for connection pooling, load monitoring, and queue management.
+* **The Knowledge Base:** Qdrant Vector Database populated with real government scheme data.
+* **The Brain:** Amazon Bedrock (Nova Lite) acting as the RAG reasoning engine to generate highly contextual, accurate, markdown-formatted scheme guides.
+* **The Infrastructure:** Fully containerized via Docker Compose and deployed live on an **AWS EC2 instance**.
+
+## 🗺️ Phase 2 Roadmap (The Multimodal Vision)
+
+With the foundational RAG pipeline stabilized, our immediate development roadmap introduces frugal engineering and full multimodal accessibility:
+
+1. **Native Language Voice & Text Output:** Integrating **OpenAI Whisper** and **AWS Polly** to allow users to send voice notes in local dialects (Hindi, Odia, Bhojpuri). The AI will maintain the language state and return both a **playable audio reply** and a **detailed text guide** entirely in the user's native language.
+
+2. **Ultra-Low Latency C-Layer:** A custom C-language shared library (`.so`) bound via `ctypes` that acts as a 0.01ms "Desi Safety Filter" to block spam/unsafe queries locally *before* they hit the expensive cloud LLM, reducing API costs by 40%.
+
+3. **Instant Document Vision (OCR):** Allowing users to snap photos of Income Certificates to automatically extract eligibility data.
+
+4. **Auto-Form Generation:** Generating pre-filled PDF application forms directly within the WhatsApp chat.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend:** Python, FastAPI, Docker, Docker Compose
+* **Databases:** Qdrant (Vector), PostgreSQL (Relational), Redis (Queue)
+* **AI/LLM:** Amazon Bedrock (Nova Lite v1:0)
+* **Cloud & DevOps:** Amazon Web Services (EC2, IAM), Kiro.dev (Spec-Driven Dev)
+* **Integrations:** Twilio (WhatsApp API)
+
+---
+
+## 💻 Local Setup & Deployment
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/yourusername/Y-Connect.git
+cd Y-Connect
+```
+
+2. **Configure Environment:**
+
+Create a `.env` file and add your AWS, Twilio, Redis, and Postgres credentials. Ensure `AWS_DEFAULT_REGION="us-east-1"` is set for Amazon Nova access.
+
+3. **Deploy the Engine:**
+
+```bash
+# Launch the microservices in detached mode
+sudo docker-compose up -d --build app
+```
+
+4. **Ingest Scheme Data:**
+
+```bash
+# Populate the Qdrant Vector DB with scheme data
+sudo docker-compose exec app python -m scripts.execute_hybrid_approach
+```
+
+5. **Expose Webhook:**
+
+Link your server's public IP (e.g., `http://YOUR_EC2_IP:8000/twilio`) to your Twilio Sandbox settings.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with passion for bridging India's digital divide. Special thanks to AWS, Twilio, and the open-source community.
+
+---
+
+Made with ❤️ for Bharat
