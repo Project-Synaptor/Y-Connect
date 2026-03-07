@@ -1,6 +1,6 @@
 # 🇮🇳 Y-Connect: The Voice-First Government "Buddy"
 
-**Team Name:** GitHappens  
+**Team Name:** Git Happens_04  
 **Team Leader:** Tushar Singh  
 **Hackathon:** AI for Bharat Hackathon (Powered by AWS)  
 **Track:** AI for Communities, Access & Public Impact  
